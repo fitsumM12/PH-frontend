@@ -11,27 +11,19 @@ import {
   Grid,
   styled,
   Tooltip,
-  MenuItem,
-  Select,
 } from "@mui/material";
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { FormControl, InputLabel } from "@mui/material";
-import Autocomplete from '@mui/material/Autocomplete';
+import Autocomplete from "@mui/material/Autocomplete";
+import { FormControl } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Span } from "app/components/Typography";
-import { getBreeds } from "app/apis/chicken_api";
+import { addRequester, getRequester,getRequesters, updateRequesterInAPI , deleteRequester} from "app/apis/requester_api";
+
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useContext } from "react";
 import AuthContext from "app/contexts/JWTAuthContext";
-import {
-  addHatcherRecord,
-  deleteHatcherRecord,
-  getHatcherRecord,
-  getHatcherRecords,
-  updateHatcherRecordInAPI,
-} from "app/apis/hatchery_unit_api";
+import { getBreeds, getHouses } from "app/apis/chicken_api";
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
   marginBottom: "16px",
@@ -47,67 +39,65 @@ const StyledTable = styled(Table)(() => ({
   },
 }));
 
-const ViewHactheryRecord = () => {
+const ViewRequester = () => {
   const { user } = useContext(AuthContext);
   const initialFormData = {
-    id: 0,
-    breed_of_chicken: 0,
-    number_of_eggs_set: 0,
-    date_of_set: new Date().toISOString().split("T")[0],
-    hour_of_set: new Date().toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    date_of_candling: new Date().toISOString().split("T")[0],
-    date_of_transfer: new Date().toISOString().split("T")[0],
-    collector: user.id,
+    requester_id: "",
+    requester_name: "",
+    requester_region: "",
+    requester_district:"",
+    requester_city:"",
+    requester_phone_number:"",
+    requester_male_count: 0.0,
+    requester_female_count: 0.0
   };
-
   const [add, setAdd] = useState(false);
   const [del, setDelete] = useState(true);
   const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [hatcheryRecord, setHatcheryRecord] = useState([]);
-  const [hatcheryRecords, setHatcheryRecords] = useState([]);
+  const [requesters, setRequesters] = useState([]);
+  const [requester, setRequester] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
-  const [breeds, setBreeds] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
-  // const [hatcheryRecords, setHatcheryRecords] = useState([]);
-  const [filteredHatcheryRecordsForUser, setFilteredHatcheryRecordsForUser] = useState([]);
-  
   useEffect(() => {
-    const fetchHatcheryRecords = async () => {
-      try {
-        const hatcheryData = await getHatcherRecords();
-        setHatcheryRecords(hatcheryData);
-      } catch (error) {
-        console.error("Error fetching hatcheryRecords:", error);
-      }
+    const fetchRequesters = async () => {
+        try {
+            const requestersData = await getRequesters();
+            setRequesters(requestersData);
+        } catch (error) {
+            console.error("Error fetching requesters:", error);
+        }
     };
-    fetchHatcheryRecords();
-  }, [add, del, edit]);
-  
-  useEffect(() => {
-    if (user.role === 'USER') {
-      const filteredData = hatcheryRecords.filter(item => item.collector === user.id);
-      setFilteredHatcheryRecordsForUser(filteredData);
-    } else {
-      setFilteredHatcheryRecordsForUser(hatcheryRecords);
-    }
-  }, [hatcheryRecords, user]);
-  
-  const handleDeleteHatcheryRecords = async (id) => {
+
+    fetchRequesters();
+}, []);
+useEffect(() => {
+    const fetchRequesters = async () => {
+        try {
+            const requestersData = await getRequesters(); // Fetching data from getRequesters
+            setRequesters(requestersData); // Update state with the fetched data
+        } catch (error) {
+            console.error("Error fetching requesters:", error); // Error handling
+        }
+    };
+
+    fetchRequesters();
+}, [add, del, edit]); // Dependencies that trigger re-fetching
+
+  const handleDeleteRequester = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this hatchery records?"
+      "Are you sure you want to delete this requester record?"
     );
 
     if (confirmed) {
       try {
-        await deleteHatcherRecord(id);
+        const response = await deleteRequester(id);  // Make sure this function works
+        console.log(response);  // Log the response for debugging
         setDelete((prev) => !prev);
       } catch (error) {
-        console.error("Failed to delete the records:", error);
+        console.error("Failed to delete the requester record:", error);
       }
     } else {
       console.log("Deletion cancelled");
@@ -127,24 +117,24 @@ const ViewHactheryRecord = () => {
     setAdd(true);
     setFormData(initialFormData);
   };
-  const updateHatcheryRecords = async (id) => {
+  const updateRequester = async (id) => {
     setEdit(true);
     try {
-      const response = await getHatcherRecord(id);
-      setHatcheryRecord(response);
+      const response = await getRequester(id);
+      setRequester(response);
     } catch (error) {
-      console.error("Error fetching records:", error);
+      console.error("Error fetching requester:", error);
     }
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      await addHatcherRecord(formData);
+      await addRequester(formData);
       setAdd(false);
     } catch (error) {
-      console.error("Error adding records:", error);
+      console.error("Error adding requester:", error);
     }
   };
 
@@ -159,51 +149,38 @@ const ViewHactheryRecord = () => {
     });
   };
   const handleChangeEdit = (event) => {
-    setHatcheryRecord({
-      ...hatcheryRecord,
+    setRequester({
+      ...requester,
       [event.target.name]: event.target.value,
     });
   };
-  const handleUpdateHatcheryRecord = async (e) => {
+
+
+  const handleUpdateRequester = async (e) => {
     e.preventDefault();
     try {
-      await updateHatcherRecordInAPI(hatcheryRecord.id, hatcheryRecord);
+      await updateRequesterInAPI(requester.id, requester);
       setEdit(false);
       setAdd(false);
     } catch (error) {
-      console.error("Error updating records:", error);
+      console.error("Error updating requester:", error);
     }
   };
-  useEffect(() => {
-    const fetchBreeds = async () => {
-      try {
-        const breedsData = await getBreeds();
-        setBreeds(breedsData);
-      } catch (error) {
-        console.error("Error fetching Breeds:", error);
-      }
-    };
-    fetchBreeds();
-  }, [add, edit]);
-  const getBreedDetails = (id) => {
-    const breed = breeds.find((b) => b.id === id);
-    return breed ? `${breed.name}` : "Unknown Breed";
-  };
+
   const handleDownLoad = () => {
-    const fetchHatcheryRecords = async () => {
+    const fetchRequesters = async () => {
       try {
-        const housesData = await getHatcherRecords();
-        const csvData = jsonToCsv(housesData);
-        downloadCsv(csvData, "hatcheryrecords.csv");
+        const requesterData = await getRequesters();
+        const csvData = jsonToCsv(requesterData);
+        downloadCsv(csvData, "requesterdata.csv");
       } catch (error) {
-        console.error("Error fetching records:", error);
+        console.error("Error fetching bodyweight:", error);
       }
     };
-
-    fetchHatcheryRecords();
+    fetchRequesters();
   };
 
-  const jsonToCsv = (jsonData) => {
+  function jsonToCsv(jsonData) {
     const keys = Object.keys(jsonData[0]);
     const csvRows = jsonData.map((row) =>
       keys.map((key) => JSON.stringify(row[key], null, "")).join(",")
@@ -211,9 +188,9 @@ const ViewHactheryRecord = () => {
 
     csvRows.unshift(keys.join(","));
     return csvRows.join("\n");
-  };
+  }
 
-  const downloadCsv = (csvData, filename) => {
+  function downloadCsv(csvData, filename) {
     const blob = new Blob([csvData], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
 
@@ -224,11 +201,11 @@ const ViewHactheryRecord = () => {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-  };
+  }
 
-  const [searchQuery, setSearchQuery] = useState("");
-  const filterrecords = filteredHatcheryRecordsForUser.filter((record) =>
-    String(record.id).toLowerCase().includes(searchQuery.toLowerCase())
+  
+  const filteredrequesters = requesters.filter((requester) =>
+      String(requester.requester_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -241,20 +218,18 @@ const ViewHactheryRecord = () => {
                 <TableCell align="center">
                   <ValidatorForm>
                     <TextValidator
-                      label="Search by ID"
+                      label="Requester ID"
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      name="search"
+                      // name="bird_id"
                       value={searchQuery}
                       validators={["required"]}
                       errorMessages={["this field is required"]}
                     />
                   </ValidatorForm>
                 </TableCell>
-                <TableCell align="center">Breed</TableCell>
-                <TableCell align="center">Egg Set</TableCell>
-                <TableCell align="center">Date of Set</TableCell>
-                <TableCell align="center">Date of Candling</TableCell>
-                <TableCell align="center">Date of Transfer</TableCell>
+                <TableCell align="center">Name</TableCell>
+                <TableCell align="center">Region</TableCell>
+                <TableCell align="center">City</TableCell>
                 <TableCell align="right">
                   Action | <Button onClick={addNew}>Add New</Button>
                 </TableCell>
@@ -266,60 +241,51 @@ const ViewHactheryRecord = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filterrecords
+              {filteredrequesters
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((record, index) => (
+                .map((requester, index) => (
                   <TableRow key={index}>
-                    <TableCell align="center">{record.id}</TableCell>
                     <TableCell align="center">
-                      {getBreedDetails(record.breed_of_chicken)}
+                    {requester.requester_id}
                     </TableCell>
-                    <TableCell align="center">
-                      {record.number_of_eggs_set}
-                    </TableCell>
-                    <TableCell align="center">{record.date_of_set}</TableCell>
-                    <TableCell align="center">
-                      {record.date_of_candling}
-                    </TableCell>
-                    <TableCell align="center">
-                      {record.date_of_transfer}
-                    </TableCell>
+                    <TableCell align="center">{requester.requester_name}</TableCell>
+                    <TableCell align="center">{requester.requester_region}</TableCell>
+                    <TableCell align="center">{requester.requester_city}</TableCell>
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <IconButton
-                          onClick={() => updateHatcheryRecords(record.id)}
+                          onClick={() => {
+                            updateRequester(requester.id);
+                          }}
                           sx={{ "&:hover": { bgcolor: "grey.200" } }}
                         >
                           <EditIcon sx={{ color: "green" }} />
                         </IconButton>
                       </Tooltip>
-                      {user.role !== "USER" && (
+                      {user.role !== "USER" ? (
                         <Tooltip title="Delete">
                           <IconButton
-                            onClick={() =>
-                              handleDeleteHatcheryRecords(record.id)
-                            }
+                            onClick={() => handleDeleteRequester(requester.id)}
                             sx={{ "&:hover": { bgcolor: "grey.200" } }}
                           >
                             <DeleteIcon sx={{ color: "red" }} />
                           </IconButton>
                         </Tooltip>
-                      )}
+                      ) : null}
                     </TableCell>
-                    
                     {user.role !== "USER" ? (
-                                        <TableCell align="center"></TableCell>) : (null)}
+                      <TableCell align="center"></TableCell>
+                    ) : null}
                   </TableRow>
                 ))}
             </TableBody>
           </StyledTable>
-
           <TablePagination
             sx={{ px: 2 }}
             page={page}
             component="div"
             rowsPerPage={rowsPerPage}
-            count={filterrecords.length}
+            count={filteredrequesters.length}
             onPageChange={handleChangePage}
             rowsPerPageOptions={[5, 10, 25]}
             onRowsPerPageChange={handleChangeRowsPerPage}
@@ -327,94 +293,89 @@ const ViewHactheryRecord = () => {
             backIconButtonProps={{ "aria-label": "Previous Page" }}
           />
         </>
-      ) : edit === true && add === false ? (
-        <ValidatorForm
-          onSubmit={handleUpdateHatcheryRecord}
-          onError={() => null}
-        >
-          <Grid container spacing={6}>
+      )  : edit === true && add === false ? (
+        <ValidatorForm onSubmit={handleUpdateRequester} onError={() => null}>
+          <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
               <TextField
-                type="text"
-                name="id"
-                label="ID"
+                label="Requester ID"
                 onChange={handleChangeEdit}
-                value={hatcheryRecord.id}
-                InputProps={{
-                  readOnly: true,
-                }}
+                name="requester_id"
+                value={requester.requester_id}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Breed</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="breed_of_chicken"
-                  value={hatcheryRecord.breed_of_chicken}
-                  onChange={handleChangeEdit}
-                  label="Breed"
-                  required
-                >
-                  {breeds.map((breed) => (
-                    <MenuItem key={breed.id} value={breed.id}>
-                      {breed.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <br />
-              <br />
               <TextField
-                type="number"
-                name="number_of_eggs_set"
-                label="Egg Set"
+                label="Requester Name"
                 onChange={handleChangeEdit}
-                value={hatcheryRecord.number_of_eggs_set}
+                name="requester_name"
+                value={requester.requester_name}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
 
               <TextField
-                type="Date"
-                name="date_of_set"
-                label="Date of Set"
+                label="Region"
                 onChange={handleChangeEdit}
-                value={hatcheryRecord.date_of_set}
+                name="requester_region"
+                value={requester.requester_region}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                fullWidth
               />
+              <TextField
+                label="City"
+                onChange={handleChangeEdit}
+                name="requester_city"
+                value={requester.requester_city}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+              />
+
             </Grid>
-
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <TextField
-                type="time"
-                name="hour_of_set"
-                label="Hour Set"
+
+            <TextField
+                label="District"
                 onChange={handleChangeEdit}
-                value={hatcheryRecord.hour_of_set}
+                name="requester_district"
+                value={requester.requester_district}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
-              />
-              <TextField
-                type="Date"
-                name="date_of_candling"
-                label="Date of Candling"
-                onChange={handleChangeEdit}
-                value={hatcheryRecord.date_of_candling}
-                validators={["required"]}
-                errorMessages={["This field is required"]}
+                fullWidth
               />
 
-              <TextField
-                type="Date"
-                name="date_of_transfer"
-                label="Date of Transfer"
+            <TextField
+                label="Phone Number"
                 onChange={handleChangeEdit}
-                value={hatcheryRecord.date_of_transfer}
+                name="requester_phone_number"
+                value={requester.requester_phone_number}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                fullWidth
               />
+              <TextField
+                label="Male Count"
+                onChange={handleChangeEdit}
+                name="requester_male_count"
+                value={requester.requester_male_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+                type="number"
+              />
+                <TextField
+                label="Female Count"
+                onChange={handleChangeEdit}
+                name="requester_female_count"
+                value={requester.requester_female_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+                type="number"
+              />
+ 
             </Grid>
           </Grid>
           <Tooltip title="Back">
@@ -441,100 +402,90 @@ const ViewHactheryRecord = () => {
         </ValidatorForm>
       ) : (
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-          <Grid container spacing={6}>
+          <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              {/* <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Breed</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="breed_of_chicken"
-                  value={formData.breed_of_chicken}
-                  onChange={handleChange}
-                  label="Breed"
-                  required
-                >
-                  {breeds.map((breed) => (
-                    <MenuItem key={breed.id} value={breed.id}>
-                      {breed.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl> */}
-
-<FormControl variant="outlined" fullWidth>
-  <Autocomplete
-    options={breeds}  // Array of breeds
-    getOptionLabel={(option) => `ID : ${option.id} Name: ${option.name}`}  // Display breed name
-    onChange={(event, value) => {
-      setFormData({
-        ...formData,
-        breed_of_chicken: value?.id || "",  // Update the breed_of_chicken with selected breed's ID
-      });
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        label="Select Breed"
-        variant="outlined"
-        required
-      />
-    )}
-  />
-</FormControl>
-
-              
-              <br />
-              <br />
               <TextField
-                type="number"
-                name="number_of_eggs_set"
-                label="Egg Set"
+                type="text"
+                name="requester_id"
+                label="Requester id:"
                 onChange={handleChange}
-                value={formData.number_of_eggs_set}
+                value={formData.requester_id}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
 
               <TextField
-                type="Date"
-                name="date_of_set"
-                label="Date of Set"
+                type="text"
+                name="requester_name"
+                label="Requester name:"
                 onChange={handleChange}
-                value={formData.date_of_set}
+                value={formData.requester_name}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+              />
+
+              <TextField
+                type="text"
+                name="requester_region"
+                label="Requester region:"
+                onChange={handleChange}
+                value={formData.requester_region}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+              />
+                <TextField
+                type="text"
+                name="requester_district"
+                label="Requester district"
+                onChange={handleChange}
+                value={formData.requester_district}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
               />
             </Grid>
-
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
               <TextField
-                type="time"
-                name="hour_of_set"
-                label="Hour Set"
+                type="text"
+                name="requester_city"
+                label="Requester city"
                 onChange={handleChange}
-                value={formData.hour_of_set}
+                value={formData.requester_city}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                step="0.01"
+              />
+                <TextField
+                type="number"
+                name="requester_phone_number"
+                label="Requester phone number"
+                onChange={handleChange}
+                value={formData.requester_phone_number}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+                <TextField
+                type="number"
+                name="requester_male_count"
+                label="Requester male count"
+                onChange={handleChange}
+                value={formData.requester_male_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
               />
               <TextField
-                type="Date"
-                name="date_of_candling"
-                label="Date of Candling"
+                type="number"
+                name="requester_female_count"
+                label="Requester female count"
                 onChange={handleChange}
-                value={formData.date_of_candling}
+                value={formData.requester_female_count}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                step="0.01"
               />
 
-              <TextField
-                type="Date"
-                name="date_of_transfer"
-                label="Date of Transfer"
-                onChange={handleChange}
-                value={formData.date_of_transfer}
-                validators={["required"]}
-                errorMessages={["This field is required"]}
-              />
             </Grid>
           </Grid>
           <Tooltip title="Back">
@@ -565,4 +516,4 @@ const ViewHactheryRecord = () => {
     </>
   );
 };
-export default ViewHactheryRecord;
+export default ViewRequester;

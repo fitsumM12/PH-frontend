@@ -65,21 +65,45 @@ const ViewGroupDeath = () => {
     const [houses, setHouses] = useState([]);
     const [breeds, setBreeds] = useState([]);
     const [groupdeaths, setGroupDeaths] = useState([]);
+    const [filteredGroupDeathsForUser, setFilteredGroupDeathsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
+    // useEffect(() => {
+    //     const fetchGroupDeaths = async () => {
+    //         try {
+    //             const groupdeathsData = await getGroupDeaths();
+    //             setGroupDeaths(groupdeathsData);
+    //         } catch (error) {
+    //             console.error('Error fetching chickens:', error);
+    //         }
+    //     };
+    //     fetchGroupDeaths();
+    // }, [add, del, edit]);
+
+
     useEffect(() => {
         const fetchGroupDeaths = async () => {
-            try {
-                const groupdeathsData = await getGroupDeaths();
-                setGroupDeaths(groupdeathsData);
-            } catch (error) {
-                console.error('Error fetching chickens:', error);
-            }
+          try {
+            const groupdeathsData = await getGroupDeaths();
+            setGroupDeaths(groupdeathsData);
+          } catch (error) {
+            console.error('Error fetching deaths:', error);
+          }
         };
         fetchGroupDeaths();
-    }, [add, del, edit]);
+      }, [add, del, edit]);
+      
+      // Filter Group Deaths based on User Role
+      useEffect(() => {
+        if (user.role === "USER") {
+          const filteredData = filteredGroupDeathsForUser.filter(item => item.collector === user.id);
+          setFilteredGroupDeathsForUser(filteredData);
+        } else {
+          setFilteredGroupDeathsForUser(groupdeaths);
+        }
+      }, [groupdeaths, user]);
 
 
     useEffect(() => {
@@ -269,7 +293,7 @@ const ViewGroupDeath = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filtereddeaths = groupdeaths.filter((death) =>
+    const filtereddeaths = filteredGroupDeathsForUser.filter((death) =>
         String(getGroupDetails(death.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

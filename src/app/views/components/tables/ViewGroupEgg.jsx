@@ -65,21 +65,46 @@ const ViewGroupEgg = () => {
     const [houses, setHouses] = useState([]);
     const [breeds, setBreeds] = useState([]);
     const [groupeggs, setGroupEggs] = useState([]);
+    const [filteredGroupEggsForUser, setFilteredGroupEggsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
-    useEffect(() => {
-        const fetchGroupEggs = async () => {
-            try {
-                const groupeggsData = await getGroupEggs();
-                setGroupEggs(groupeggsData);
-            } catch (error) {
-                console.error('Error fetching chickens:', error);
-            }
-        };
-        fetchGroupEggs();
-    }, [add, del, edit]);
+    // useEffect(() => {
+    //     const fetchGroupEggs = async () => {
+    //         try {
+    //             const groupeggsData = await getGroupEggs();
+    //             setGroupEggs(groupeggsData);
+    //         } catch (error) {
+    //             console.error('Error fetching chickens:', error);
+    //         }
+    //     };
+    //     fetchGroupEggs();
+    // }, [add, del, edit]);
+
+
+    // Fetch Group Eggs (similar to Group Bodyweights)
+useEffect(() => {
+    const fetchGroupEggs = async () => {
+      try {
+        const groupeggsData = await getGroupEggs();
+        setGroupEggs(groupeggsData);
+      } catch (error) {
+        console.error('Error fetching eggs:', error);
+      }
+    };
+    fetchGroupEggs();
+  }, [add, del, edit]);
+  
+  // Filter Group Eggs based on User Role
+  useEffect(() => {
+    if (user.role === "USER") {
+      const filteredData = groupeggs.filter(item => item.collector === user.id);
+      setFilteredGroupEggsForUser(filteredData);
+    } else {
+      setFilteredGroupEggsForUser(groupeggs);
+    }
+  }, [groupeggs, user]);
 
 
     useEffect(() => {
@@ -263,7 +288,7 @@ const ViewGroupEgg = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredeggs = groupeggs.filter((egg) =>
+    const filteredeggs = filteredGroupEggsForUser.filter((egg) =>
         String(getGroupDetails(egg.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

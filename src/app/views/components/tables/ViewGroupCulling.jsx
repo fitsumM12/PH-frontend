@@ -65,21 +65,45 @@ const ViewGroupCulling = () => {
     const [groupculling, setGroupCulling] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [groupcullings, setGroupCullings] = useState([]);
+    const [filteredGroupCullingsForUser, setFilteredGroupCullingsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
-    useEffect(() => {
-        const fetchGroupCullings = async () => {
-            try {
-                const groupcullingsData = await getGroupCullings();
-                setGroupCullings(groupcullingsData);
-            } catch (error) {
-                console.error('Error fetching cullings:', error);
-            }
-        };
-        fetchGroupCullings();
-    }, [add, del, edit]);
+    // useEffect(() => {
+    //     const fetchGroupCullings = async () => {
+    //         try {
+    //             const groupcullingsData = await getGroupCullings();
+    //             setGroupCullings(groupcullingsData);
+    //         } catch (error) {
+    //             console.error('Error fetching cullings:', error);
+    //         }
+    //     };
+    //     fetchGroupCullings();
+    // }, [add, del, edit]);
+
+    // Fetch Group Cullings (similar to Bodyweights, Eggs, and Deaths)
+useEffect(() => {
+    const fetchGroupCullings = async () => {
+      try {
+        const groupcullingsData = await getGroupCullings();
+        setGroupCullings(groupcullingsData);
+      } catch (error) {
+        console.error('Error fetching cullings:', error);
+      }
+    };
+    fetchGroupCullings();
+  }, [add, del, edit]);
+  
+  // Filter Group Cullings based on User Role
+  useEffect(() => {
+    if (user.role === "USER") {
+      const filteredData = groupcullings.filter(item => item.collector === user.id);
+      setFilteredGroupCullingsForUser(filteredData);
+    } else {
+      setFilteredGroupCullingsForUser(groupcullings);
+    }
+  }, [groupcullings, user]);
 
 
     useEffect(() => {
@@ -268,7 +292,7 @@ const ViewGroupCulling = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredcullings = groupcullings.filter((culling) =>
+    const filteredcullings = filteredGroupCullingsForUser.filter((culling) =>
         String(getGroupDetails(culling.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

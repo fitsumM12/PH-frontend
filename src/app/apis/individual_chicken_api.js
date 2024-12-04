@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 // Base URL for your API
 const CHICKEN_API_URL = 'http://127.0.0.1:8000/api/poultry/';
 const token = localStorage.getItem('token');
@@ -299,6 +298,8 @@ export const addIntake = async (formData) => {
         throw error;
     }
 }
+
+
 
 // FETCH ALL INTAKE
 export const getIntakes = async () => {

@@ -11,17 +11,22 @@ import {
     Grid,
     styled,
     Tooltip,
+    MenuItem, Select
 } from "@mui/material";
+import {
+    FormControlLabel,
+    Radio,
+    RadioGroup,
+} from "@mui/material";
+import { FormControl, InputLabel } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import { FormControl } from '@mui/material';
-
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Span } from "app/components/Typography";
-import { getBreeds, getHouses } from 'app/apis/chicken_api';
-import { addGroupIntake, getGroupIntake, deleteGroupIntake, updateGroupIntakeInAPI, getGroupIntakes } from 'app/apis/group_chicken_api';
-import { getGroupChickens } from 'app/apis/group_chicken_api';
+import { getBreeds } from 'app/apis/chicken_api';
+import { getRequesters } from 'app/apis/requester_api';
+import { addChickenDistribution, getChickenDistribution, deleteChickenDistribution, updateChickenDistributionInAPI, getChickenDistributions } from 'app/apis/chicken_distribution_api';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
 import AuthContext from 'app/contexts/JWTAuthContext';
@@ -42,84 +47,50 @@ const StyledTable = styled(Table)(() => ({
     }
 }));
 
-
-const ViewGroupIntake = () => {
+const ViewChickenDistribution = () => {
 
     const { user } = useContext(AuthContext);
     const initialFormData = {
-        id: 0,
-        chicken_group: 0,
-        record_date: new Date().toISOString().split('T')[0],
-        feed_given: 0,
-        feed_refusal: 0,
-        collector: user.id,
-        remarks: 'this is a remark'
+        chicken_distribution_id: "",
+        breed: 0,
+        quantity_sold: 0,
+        healthy_hatchlings_count: 0,
+        number_of_eggs_incubated: 0,
+        date_of_hatch: "",
+        requester: 0,
+        distributor_name: user.id,  
     };
-
+    const initialFormDataForMortality = {
+        id: 0,
+        bird: 0,
+        date: new Date().toISOString().split('T')[0],
+        condition: 'alive',
+        collector: user.id,
+        reason: 'good healthy'
+    };
     const [add, setAdd] = useState(false);
     const [del, setDelete] = useState(true)
     const [edit, setEdit] = useState(false)
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [groupintake, setGroupIntake] = useState(initialFormData);
-    const [houses, setHouses] = useState([]);
+    const [chickendistributions, setChickenDistributions] = useState([]);
+    const [chickendistribution, setChickenDistribution] = useState(initialFormData);
     const [breeds, setBreeds] = useState([]);
-    const [groupIntakes, setGroupIntakes] = useState([]);
-    const [groupchickens, setGroupChickens] = useState([]);
+    const [requesters, setRequesters] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
-    const [combinedData, setCombinedData] = useState({})
 
-    // useEffect(() => {
-    //     const fetchGroupIntakes = async () => {
-    //         try {
-    //             const groupintakesData = await getGroupIntakes();
-    //             setGroupIntakes(groupintakesData);
-    //         } catch (error) {
-    //             console.error('Error fetching chickens:', error);
-    //         }
-    //     };
-    //     fetchGroupIntakes();
-    // }, [add, del, edit]);
-
-    // const [groupIntakes, setGroupIntakes] = useState([]);
-const [filteredGroupIntakesForUser, setFilteredGroupIntakesForUser] = useState([]);
-
-useEffect(() => {
-    const fetchGroupIntakes = async () => {
-        try {
-            const groupIntakesData = await getGroupIntakes();
-            setGroupIntakes(groupIntakesData);
-        } catch (error) {
-            console.error("Error fetching group intakes:", error);
-        }
-    };
-    fetchGroupIntakes();
-}, [add, del, edit]);
-
-// Filter Group Intakes based on User Role
-useEffect(() => {
-    if (user.role === "USER") {
-        const filteredData = groupIntakes.filter((item) => item.collector === user.id);
-        setFilteredGroupIntakesForUser(filteredData);
-    } else {
-        setFilteredGroupIntakesForUser(groupIntakes);
-    }
-}, [groupIntakes, user]);
-
-
-
+    const [searchQuery, setSearchQuery] = useState('');
     useEffect(() => {
-        const fetchGroupChickens = async () => {
+        const fetchChickenDistributions = async () => {
             try {
-                const groupchickensData = await getGroupChickens();
-                setGroupChickens(groupchickensData);
+                const chickendistributionsData = await getChickenDistributions();
+                setChickenDistributions(chickendistributionsData);
             } catch (error) {
-                console.error('Error fetching chickens:', error);
+                console.error('Error fetching chickendistributions:', error);
             }
         };
-
-        fetchGroupChickens();
-    }, [add, edit]);
+        fetchChickenDistributions();
+    }, [add, del, edit]);
 
 
     useEffect(() => {
@@ -131,67 +102,42 @@ useEffect(() => {
                 console.error('Error fetching Breeds:', error);
             }
         };
-        const fetchHouses = async () => {
+        const fetchRequesters = async () => {
             try {
-                const housesData = await getHouses();
-                setHouses(housesData);
+                const requestersData = await getRequesters();
+                setRequesters(requestersData);
             } catch (error) {
-                console.error('Error fetching Houses:', error);
+                console.error('Error fetching requesters:', error);
             }
         };
         fetchBreeds();
-        fetchHouses();
+        fetchRequesters();
     }, [add, edit]);
-
     const getBreedDetails = (id) => {
         const breed = breeds.find((b) => b.id === id);
         return breed ? `${breed.name}` : 'Unknown Breed';
     };
 
 
-    const getHouseDetails = (id) => {
-        const house = houses.find((h) => h.id === id);
-        return house ? `${house.pen_number}` : 'Unknown House';
+    const getRequesterDetails = (id) => {
+        const requester = requesters.find((r) => r.id === id);
+        return requester ? `${requester.requester_name}` : 'no Requester';
     };
 
-
-    const getGroupDetails = (id) => {
-        const groupchicken = groupchickens.find((h) => h.id === id);
-        return groupchicken ? `${groupchicken.id}: ${getBreedDetails(groupchicken.breed)}-${getHouseDetails(groupchicken.house)}` : 'Unknown House';
-    };
-
-
-
-    useEffect(() => {
-        if (groupchickens.length > 0 && houses.length > 0) {
-            const combined = groupchickens.map((chicken) => {
-                const house = houses.find((h) => h.id === chicken.house);
-                return {
-                    ...chicken,
-                    house_number: house ? house.house_number : "Unknown",
-                    pen_number: house ? house.pen_number : "Unknown",
-                    location: house ? house.location : "Unknown",
-                };
-            });
-            setCombinedData(combined);
-        }
-    }, [groupchickens, houses]);
-
-    const handleDeleteGroupIntake = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this group intake record?");
+    const handleDeleteChickenDistribution = async (id) => {
+        const confirmed = window.confirm("Are you sure you want to delete this chickendistributions?");
 
         if (confirmed) {
             try {
-                await deleteGroupIntake(id);
+                await deleteChickenDistribution(id);
                 setDelete(prev => !prev);
             } catch (error) {
-                console.error('Failed to delete the group intake record:', error);
+                console.error('Failed to delete the chickendstributions:', error);
             }
         } else {
             console.log('Deletion cancelled');
         }
     };
-
 
 
     const handleChangePage = (_, newPage) => {
@@ -207,23 +153,23 @@ useEffect(() => {
         setAdd(true);
         setFormData(initialFormData);
     };
-    const updateGroupIntake = async (id) => {
+    const updateChickenDistribution = async (id) => {
         setEdit(true);
         try {
-            const response = await getGroupIntake(id);
-            setGroupIntake(response);
+            const response = await getChickenDistribution(id);
+            setChickenDistribution(response);
         } catch (error) {
-            console.error('Error fetching chicken:', error);
+            console.error('Error fetching chickendistribution:', error);
         }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await addGroupIntake(formData);
+            const res = await addChickenDistribution(formData);
             setAdd(false);
         } catch (error) {
-            console.error('Error adding chicken:', error);
+            console.error('Error adding chickendistribution:', error);
         }
     };
 
@@ -238,33 +184,35 @@ useEffect(() => {
         });
     };
     const handleChangeEdit = (event) => {
-        setGroupIntake({
-            ...groupintake,
+        setChickenDistribution({
+            ...chickendistribution,
             [event.target.name]: event.target.value,
         });
     };
-    const handleUpdateBodyweigtht = async (e) => {
+    const handleUpdateChickenDistribution = async (e) => {
         e.preventDefault();
         try {
-            await updateGroupIntakeInAPI(groupintake.id, groupintake);
+            await updateChickenDistributionInAPI(chickendistribution.id, chickendistribution);
             setEdit(false);
             setAdd(false)
         } catch (error) {
-            console.error('Error updating groupintake:', error);
+            console.error('Error updating chickendistribution:', error);
         }
     };
 
+
+
     const handleDownLoad = () => {
-        const fetchGroupIntakes = async () => {
+        const fetchChickenDistributions = async () => {
             try {
-                const groupintakesData = await getGroupIntakes();
-                const csvData = jsonToCsv(groupintakesData);
-                downloadCsv(csvData, 'groupintakeData.csv');
+                const chickenDistributionData = await getChickenDistributions();
+                const csvData = jsonToCsv(chickenDistributionData);
+                downloadCsv(csvData, 'chickendistribution.csv');
             } catch (error) {
-                console.error('Error fetching groupintake:', error);
+                console.error('Error fetching chickendistributions:', error);
             }
         };
-        fetchGroupIntakes();
+        fetchChickenDistributions();
     };
 
     function jsonToCsv(jsonData) {
@@ -289,10 +237,8 @@ useEffect(() => {
         a.click();
         document.body.removeChild(a);
     }
-
-    const [searchQuery, setSearchQuery] = useState('');
-    const filteredgroupintake = filteredGroupIntakesForUser.filter((intake) =>
-        String(getGroupDetails(intake.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
+    const filteredchickendistributions = chickendistributions.filter((chickendistribution) =>
+        String(chickendistribution.chicken_distribution_id).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -305,59 +251,58 @@ useEffect(() => {
                                 <TableCell align="center">
                                     <ValidatorForm>
                                         <TextValidator
-                                            label="Group ID"
+                                            label="Distribution ID"
                                             onChange={(e) => setSearchQuery(e.target.value)}
-                                            name="chicken_group"
+                                            name=""
                                             value={searchQuery}
                                             validators={['required']}
                                             errorMessages={['this field is required']}
                                         />
                                     </ValidatorForm>
                                 </TableCell>
-                                <TableCell align="center">Feed Given</TableCell>
-                                <TableCell align="center">Feed Refusal</TableCell>
+                                <TableCell align="center">requester</TableCell>
+                                <TableCell align="center">Breed</TableCell>
+                                <TableCell align="center">Eggs incubated</TableCell>
+                                <TableCell align="center">Date of hatch</TableCell>
+                                <TableCell align="center">quantity_sold</TableCell>
                                 <TableCell align="right">
                                     Action | <Button onClick={addNew}>Add New</Button>
                                 </TableCell>
-
-                                {user.role !== "USER" ? (
+                                {user.role !== 'USER' ? (
                                     <TableCell align="left">
                                         <Button onClick={handleDownLoad}>Download</Button>
                                     </TableCell>) : (null)}
-
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredgroupintake.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((groupintake, index) => (
+                            {filteredchickendistributions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((chickendistribution, index) => (
                                 <TableRow key={index}>
-                                    <TableCell align="center">{getGroupDetails(groupintake.chicken_group)}</TableCell>
-                                    <TableCell align="center">{groupintake.feed_given}</TableCell>
-                                    <TableCell align="center">{groupintake.feed_refusal}</TableCell>
+                                    <TableCell align="center">{chickendistribution.chicken_distribution_id}</TableCell>
+                                    <TableCell align="center">{getRequesterDetails(chickendistribution.requester)}</TableCell>
+                                    <TableCell align="center">{getBreedDetails(chickendistribution.breed)}</TableCell>
+                                    <TableCell align="center">{chickendistribution.number_of_eggs_incubated}</TableCell>
+                                    <TableCell align="center">{chickendistribution.date_of_hatch}</TableCell>
+                                    <TableCell align="center">{chickendistribution.quantity_sold}</TableCell>
+
                                     <TableCell align="right">
                                         <Tooltip title="Edit">
                                             <IconButton
                                                 onClick={() => {
-                                                    updateGroupIntake(groupintake.id);
+                                                    updateChickenDistribution(chickendistribution.id);
                                                 }}
                                                 sx={{ '&:hover': { bgcolor: 'grey.200' } }}
                                             >
                                                 <EditIcon sx={{ color: 'green' }} />
                                             </IconButton>
                                         </Tooltip>
-
-
-                                        {user.role !== "USER" ? (
-                                            <Tooltip title="Delete">
-                                                <IconButton onClick={() => handleDeleteGroupIntake(groupintake.id)} sx={{ '&:hover': { bgcolor: 'grey.200' } }}>
-                                                    <DeleteIcon sx={{ color: 'red' }} />
-                                                </IconButton>
-                                            </Tooltip>) : (null)}
+                                        {user.role !== 'USER' ? (<Tooltip title="Delete">
+                                            <IconButton onClick={() => handleDeleteChickenDistribution(chickendistribution.id)} sx={{ '&:hover': { bgcolor: 'grey.200' } }}>
+                                                <DeleteIcon sx={{ color: 'red' }} />
+                                            </IconButton>
+                                        </Tooltip>) : (null)}
                                     </TableCell>
-
                                     {user.role !== "USER" ? (
-
                                         <TableCell align="center"></TableCell>) : (null)}
-
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -367,7 +312,7 @@ useEffect(() => {
                         page={page}
                         component="div"
                         rowsPerPage={rowsPerPage}
-                        count={filteredgroupintake.length}
+                        count={filteredchickendistributions.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -377,89 +322,117 @@ useEffect(() => {
                 </>
             ) : (
                 edit === true && add === false ? (
-                    <ValidatorForm onSubmit={handleUpdateBodyweigtht} onError={() => null}>
+                    <ValidatorForm onSubmit={handleUpdateChickenDistribution} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={combinedData}
-                                        getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
-                                        onChange={(event, value) => {
-                                            setGroupIntake({
-                                                ...groupintake,
-                                                chicken_group: value?.id || ''
-                                            });
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Select Group"
-                                                variant="outlined"
-                                                required
-                                            />
-                                        )}
-                                    />
+                                <TextField
+                                    type="text"
+                                    name="chicken_distribution_id"
+                                    label="chicken distribution id"
+                                    onChange={handleChangeEdit}
+                                    value={chickendistribution.chicken_distribution_id}
+                                    validators={["required"]}
+                                    errorMessages={["This field is required"]}
+                                />
+
+
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="breed-label">Breed</InputLabel>
+                                    <Select
+                                        labelId="breed-label"
+                                        name="breed"
+                                        value={chickendistribution.breed}
+                                        onChange={handleChangeEdit}
+                                        label="Breed"
+                                        required
+                                    >
+                                        {breeds.map((breed) => (
+                                            <MenuItem key={breed.id} value={breed.id}>
+                                                {breed.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
                                 <br />
                                 <br />
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="requester-label">Requester</InputLabel>
+                                    <Select
+                                        labelId="requester-label"
+                                        name="requester"
+                                        value={chickendistribution.requester}
+                                        onChange={handleChangeEdit}
+                                        label="requester"
+                                        required
+                                    >
+                                        {requesters.map((requester) => (
+                                            <MenuItem key={requester.id} value={requester.id}>
+                                                {requester.requester_name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                                <br />
+                                <br />
+
+
+
                                 <TextField
                                     type="Date"
-                                    name="record_date"
-                                    label="Record Date"
+                                    name="date_of_hatch"
+                                    label="Hatch Date"
                                     onChange={handleChangeEdit}
-                                    value={groupintake.record_date}
+                                    value={chickendistribution.date_of_hatch}
                                     validators={["required"]}
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
                                     errorMessages={["This field is required"]}
                                 />
+                                <br />
+                                <br />
 
-                                <TextField
-                                    type="number"
-                                    name="collector"
-                                    label="Data Collector"
-                                    onChange={handleChange}
-                                    value={formData.collector}
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    validators={["required"]}
-                                    errorMessages={["This field is required"]}
-                                />
                             </Grid>
-
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
 
                                 <TextField
                                     type="number"
-                                    name="feed_given"
-                                    label="Feed Given"
+                                    name="distributor_name"
+                                    label="distributor name"
                                     onChange={handleChangeEdit}
-                                    value={groupintake.feed_given}
+                                    value={chickendistribution.distributor_name}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
                                 <TextField
                                     type="number"
-                                    name="feed_refusal"
-                                    label="Feed Refusal"
+                                    name="number_of_eggs_incubated"
+                                    label="number of eggs incubated"
                                     onChange={handleChangeEdit}
-                                    value={groupintake.feed_refusal}
+                                    value={chickendistribution.number_of_eggs_incubated}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
-
-
                                 <TextField
-                                    type="text"
-                                    name="remarks"
-                                    label="remarks"
-                                    onChange={handleChange}
-                                    value={groupintake.remarks}
+                                    type="number"
+                                    name="healthy_hatchlings_count"
+                                    label="healthy hatchlings count"
+                                    onChange={handleChangeEdit}
+                                    value={chickendistribution.healthy_hatchlings_count}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
+                                <br />
+                                <TextField
+                                    type="number"
+                                    name="quantity_sold"
+                                    label="quantity sold"
+                                    onChange={handleChangeEdit}
+                                    value={chickendistribution.quantity_sold}
+                                    validators={["required"]}
+                                    errorMessages={["This field is required"]}
+                                />
+
 
                             </Grid>
                         </Grid>
@@ -469,6 +442,7 @@ useEffect(() => {
                             </IconButton>
                         </Tooltip>
                         &nbsp;&nbsp;&nbsp;
+
                         <Button
                             sx={{
                                 backgroundColor: '#30BA4E',
@@ -480,7 +454,7 @@ useEffect(() => {
                             type="submit"
                         >
                             <Span sx={{ pl: 1, textTransform: "capitalize" }}>
-                                update
+                                Update
                             </Span>
                         </Button>
                     </ValidatorForm>
@@ -488,20 +462,32 @@ useEffect(() => {
                     <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
+                                <TextField
+                                    type="text"
+                                    name="chicken_distribution_id"
+                                    label="chicken distribution id"
+                                    onChange={handleChange}
+                                    value={formData.chicken_distribution_id}
+                                    validators={["required"]}
+                                    errorMessages={["This field is required"]}
+                                />
+
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
-                                        options={combinedData}
-                                        getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
+                                        options={breeds}
+                                        getOptionLabel={(option) =>
+                                            `ID: ${option.id}, Name: ${option.name}`
+                                        }
                                         onChange={(event, value) => {
                                             setFormData({
                                                 ...formData,
-                                                chicken_group: value?.id || ''
+                                                breed: value?.id || "",  
                                             });
                                         }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Select Group"
+                                                label="Select Breed"
                                                 variant="outlined"
                                                 required
                                             />
@@ -510,65 +496,84 @@ useEffect(() => {
                                 </FormControl>
                                 <br />
                                 <br />
+
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={requesters} 
+                                        getOptionLabel={(option) => option.requester_name} 
+                                        value={requesters.find(requester => requester.id === formData.requester) || null}  
+                                        onChange={(event, value) => {
+                                            setFormData({
+                                                ...formData,
+                                                requester: value?.id || "", 
+                                            });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Requester"
+                                                variant="outlined"
+                                                required
+                                            />
+                                        )}
+                                    />
+                                </FormControl>
+
+
+                                <br />
+                                <br />
                                 <TextField
                                     type="Date"
-                                    name="record_date"
-                                    label="Record Date"
+                                    name="date_of_hatch"
+                                    label="Hatch Date"
                                     onChange={handleChange}
-                                    value={formData.record_date}
-                                    validators={["required"]}
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
-                                    errorMessages={["This field is required"]}
-                                />
-
-
-
-                                <TextField
-                                    type="number"
-                                    name="collector"
-                                    label="Data Collector"
-                                    onChange={handleChange}
-                                    value={formData.collector}
-                                    InputProps={{
-                                        readOnly: true,
-                                    }}
+                                    value={formData.date_of_hatch}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
 
                             </Grid>
-
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
 
+
+
                                 <TextField
                                     type="number"
-                                    name="feed_given"
-                                    label="Feed Given"
+                                    name="distributor_name"
+                                    label="distributor name"
                                     onChange={handleChange}
-                                    value={formData.feed_given}
+                                    value={formData.distributor_name}
+                                    InputProps={{
+                                        readOnly: true,
+                                    }}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
                                 <TextField
                                     type="number"
-                                    name="feed_refusal"
-                                    label="Feed Refusal"
+                                    name="number_of_eggs_incubated"
+                                    label="number of eggs incubated"
                                     onChange={handleChange}
-                                    value={formData.feed_refusal}
+                                    value={formData.number_of_eggs_incubated}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
-
-
-
                                 <TextField
-                                    type="text"
-                                    name="remarks"
-                                    label="remarks"
+                                    type="number"
+                                    name="healthy_hatchlings_count"
+                                    label="healthy hatchlings count"
                                     onChange={handleChange}
-                                    value={formData.remarks}
+                                    value={formData.healthy_hatchlings_count}
+                                    validators={["required"]}
+                                    errorMessages={["This field is required"]}
+                                />
+                                <TextField
+                                    type="number"
+                                    name="quantity_sold"
+                                    label="quantity sold"
+                                    onChange={handleChange}
+                                    value={formData.quantity_sold}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
@@ -604,4 +609,4 @@ useEffect(() => {
     );
 }
 
-export default ViewGroupIntake;
+export default ViewChickenDistribution;

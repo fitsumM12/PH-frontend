@@ -65,21 +65,45 @@ const ViewGroupReplacement = () => {
     const [groupReplacement, setGroupReplacement] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [groupReplacements, setGroupReplacements] = useState([]);
+    const [filteredGroupReplacementsForUser, setFilteredGroupReplacementsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
-    useEffect(() => {
-        const fetchGroupReplacements = async () => {
-            try {
-                const groupReplacementsData = await getGroupReplacements();
-                setGroupReplacements(groupReplacementsData);
-            } catch (error) {
-                console.error('Error fetching Replacement:', error);
-            }
-        };
-        fetchGroupReplacements();
-    }, [add, del, edit]);
+    // useEffect(() => {
+    //     const fetchGroupReplacements = async () => {
+    //         try {
+    //             const groupReplacementsData = await getGroupReplacements();
+    //             setGroupReplacements(groupReplacementsData);
+    //         } catch (error) {
+    //             console.error('Error fetching Replacement:', error);
+    //         }
+    //     };
+    //     fetchGroupReplacements();
+    // }, [add, del, edit]);
+
+    // Fetch Group Replacements (similar to Bodyweights, Eggs, Deaths, and Cullings)
+useEffect(() => {
+    const fetchGroupReplacements = async () => {
+      try {
+        const groupReplacementsData = await getGroupReplacements();
+        setGroupReplacements(groupReplacementsData);
+      } catch (error) {
+        console.error('Error fetching Replacement:', error);
+      }
+    };
+    fetchGroupReplacements();
+  }, [add, del, edit]);
+  
+  // Filter Group Replacements based on User Role
+  useEffect(() => {
+    if (user.role === "USER") {
+      const filteredData = groupReplacements.filter(item => item.collector === user.id);
+      setFilteredGroupReplacementsForUser(filteredData);
+    } else {
+      setFilteredGroupReplacementsForUser(groupReplacements);
+    }
+  }, [groupReplacements, user]);
 
 
     useEffect(() => {
@@ -273,7 +297,7 @@ const ViewGroupReplacement = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredReplacements = groupReplacements.filter((Replacement) =>
+    const filteredReplacements = filteredGroupReplacementsForUser.filter((Replacement) =>
         String(getGroupDetails(Replacement.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

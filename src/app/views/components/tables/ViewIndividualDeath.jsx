@@ -260,21 +260,44 @@ const handleChange = (event) => {
     }
 
 
-    const [mergedData, setmergedData] = useState([]); 
+    const [mergedData, setMergedData] = useState([]);
+    const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
+    
     useEffect(() => {
-        if (individualchickens.length > 0 && individualdeaths.length > 0) {
-            const combinedDeaths = individualdeaths.map((death) => {
-                const chicken = individualchickens.find((ch) => ch.id === death.bird);
-                return {
-                    ...death,
-                    bird_id: chicken ? chicken.bird_id : 'Unknown',
-                };
-            });
-            setmergedData(combinedDeaths); 
-        }
+        const mergeData = async () => {
+            try {
+                if (individualchickens.length > 0 && individualdeaths.length > 0) {
+                    const combinedDeaths = individualdeaths.map((death) => {
+                        const chicken = individualchickens.find(
+                            (ch) => ch.id === death.bird
+                        );
+                        return {
+                            ...death,
+                            bird_id: chicken ? chicken.bird_id : "Unknown",
+                            collector: death.collector, // Assuming this exists
+                        };
+                    });
+                    setMergedData(combinedDeaths);
+                }
+            } catch (error) {
+                console.error("Error merging data:", error);
+            }
+        };
+        mergeData();
     }, [individualdeaths, individualchickens]);
+    
+    // Filter Merged Data based on User Role
+    useEffect(() => {
+        if (user.role === "USER") {
+            const filteredData = mergedData.filter((item) => item.collector === user.id);
+            setFilteredMergedDataForUser(filteredData);
+        } else {
+            setFilteredMergedDataForUser(mergedData);
+        }
+    }, [mergedData, user]);
+    
     const [searchQuery, setSearchQuery] = useState('');
-    const filtereddeaths = mergedData.filter((death) =>
+    const filtereddeaths = filteredMergedDataForUser.filter((death) =>
         String(death.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
