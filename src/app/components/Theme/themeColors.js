@@ -79,6 +79,7 @@ export const themeColors = {
       text: textDark,
     },
   },
+  
   slateDark2: {
     palette: {
       type: 'dark',

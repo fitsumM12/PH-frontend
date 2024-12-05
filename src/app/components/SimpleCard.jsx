@@ -23,7 +23,7 @@ export default function SimpleCard({ children, title, subtitle }) {
   return (
     <CardRoot elevation={6} style={{
       border: '1px solid rgba(95, 96, 164, 0.5)',
-      width: '90%',
+      width: '80%',
       margin: '0 auto',
       display: 'flex',
       flexDirection: 'column',

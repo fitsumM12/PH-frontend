@@ -31,7 +31,7 @@ export default function NotFound() {
   return (
     <NotFoundRoot>
       <JustifyBox>
-        <IMG src="/assets/images/illustrations/404.svg" alt="" />
+        <IMG src="/assets/images/404.svg" alt="" />
 
         <Button
           color="primary"

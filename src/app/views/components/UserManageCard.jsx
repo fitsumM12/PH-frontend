@@ -1,6 +1,7 @@
 import React from 'react';
-import { Card, Box, styled, Grid, Button } from "@mui/material";
-import useAppContext from 'app/hooks/useAppContext';
+import { Card, Box, styled, Grid } from "@mui/material";
+import { faDove, faUsersGear } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 /////////////////////////////////
 const CardRoot = styled(Card)({
     height: "100%",
@@ -16,25 +17,24 @@ const CardTitle = styled("div")(({ subtitle }) => ({
 
 
 const UserManageCard = ({ children, title, subtitle }) => {
-    const { state, dispatch } = useAppContext();
-    const updateState = () => {
-        dispatch({ type: 'TOGGLE_ADD_NEW_USER', payload: false });
-        dispatch({ type: 'TOGGLE_VIEW_ALL_USER', payload: true });
-        dispatch({ type: 'TOGGLE_VIEW_USER', payload: false });
-    };
+  
 
     return (
-        <CardRoot elevation={6}>
+        <CardRoot elevation={6} style={{
+            padding: 20,
+            borderRadius: 10,
+            border: '1px solid rgba(95, 96, 164, 0.5)',
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }}>
             <Grid container spacing={6}>
                 <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                    <CardTitle subtitle={subtitle}>{title}</CardTitle>
+                    <CardTitle subtitle={subtitle}><FontAwesomeIcon
+                        icon={faUsersGear}
+                        color="#ECAE1F"
+                        style={{ fontSize: '32px' }} 
+                    />&nbsp;&nbsp;&nbsp;&nbsp;{title}</CardTitle>
                 </Grid>
-                <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2, justifyContent: 'flex-end', display: 'flex' }}>
-                    <>
-                        <Button onClick={updateState}> {state.add_new_user ? (<p>View All</p>) : (<p>Add New User</p>)}</Button>
-                    </>
-
-                </Grid>
+                
             </Grid>
             {subtitle && <Box mb={2}>{subtitle}</Box>}
             {children}

@@ -1,17 +1,16 @@
 import { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { Card, Checkbox, Grid, TextField, Box, styled, useTheme } from "@mui/material";
+import {useNavigate } from "react-router-dom";
+import { Card, Grid, TextField, Box, styled } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Formik } from "formik";
 import * as Yup from "yup";
 
 import useAuth from "app/hooks/useAuth";
-import { Paragraph } from "app/components/Typography";
 import Brand from "app/components/Brand";
 
-const FlexBox = styled(Box)(() => ({
-  display: "flex"
-}));
+// const FlexBox = styled(Box)(() => ({
+//   display: "flex"
+// }));
 
 const ContentBox = styled("div")(() => ({
   height: "100%",
@@ -24,7 +23,7 @@ const StyledRoot = styled("div")(() => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#1A2038",
+  // backgroundColor: "#1A2038",
   minHeight: "100% !important",
   "& .card": {
     maxWidth: 800,
@@ -59,7 +58,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function JwtLogin() {
-  const theme = useTheme();
+  // const theme = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
 
@@ -69,7 +68,7 @@ export default function JwtLogin() {
     setLoading(true);
     try {
       await login(values.email, values.password);
-      navigate("/dashboard/");
+      navigate("/");
     } catch (e) {
       console.error("Login failed:", e);
     } finally {
@@ -79,7 +78,12 @@ export default function JwtLogin() {
 
   return (
     <StyledRoot>
-      <Card className="card">
+      <Card className="card"  style={{
+            padding: 20,
+            borderRadius: 10,
+            border: '1px solid rgba(95, 96, 164, 0.5)',
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }} >
         <Grid container>
           <Grid item sm={6} xs={12}>
             <div className="img-wrapper">
@@ -130,7 +134,7 @@ export default function JwtLogin() {
                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                       <LoadingButton
                         type="submit"
-                        style={{ backgroundColor: '#181b62' }}
+                        style={{ backgroundColor: '#19B839' }}
                         loading={loading}
                         variant="contained"
                         sx={{ my: 2, borderRadius: 5, width: '60%' }}

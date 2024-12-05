@@ -1,27 +1,37 @@
 export const navigations = [
-  { name: "Dashboard", path: "/dashboard/", icon: "dashboard" },
-
   {
-    name: "New Case",
-    icon: "person",
-    path: "/newcase"
-  }, 
- 
-  {
-    name: "Patient Records",
-    icon: "group",
-    path: "/records/"
+    name: "Dashboard",
+    icon: "dashboard",
+    path: "/dashboard/",
   },
-  
-  // {
-  //   name: "Manage Users",
-  //   icon: "group",
-  //   path: "/manage_users/"
-  // },
- 
   {
-    name: "About us",
-    icon: "launch",
-    path: "https://www.aii.et/"
+    name: "Manage House | Breed",
+    icon: "apartment", 
+    path: "/managerecord/",
+  },
+  {
+    name: "Experimental Chicken",
+    icon: "home", 
+    path: "/individualrecord/",
+  },
+  {
+    name: "Manage Group Chicken",
+    icon: "apartment", 
+    path: "/grouprecord/",
+  },
+  {
+    name: "Manage Hatchery Unit",
+    icon: "egg", 
+    path: "/hatcheryunit/",
+  },
+  {
+    name: "Manage Users",
+    icon: "people", 
+    path: "/manageuser/",
+  },
+  {
+    name: "About Us",
+    icon: "info", 
+    path: "https://www.aii.et/",
   }
 ];

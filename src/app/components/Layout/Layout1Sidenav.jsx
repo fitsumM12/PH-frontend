@@ -23,7 +23,7 @@ const SidebarNavRoot = styled(Box)(({ theme, width, bg, image }) => ({
   backgroundSize: "cover",
   zIndex: 111,
   overflow: "hidden",
-  borderRight: "1.5px solid #d19a04",
+  borderRight: "1.5px solid rgba(95, 96, 164, 0.5)", 
   color: theme.palette.text.primary,
   transition: "all 250ms ease-in-out",
   backgroundImage: `linear-gradient(to bottom, rgba(${bg}, 0.96), rgba(${bg}, 0.96)), url(${image})`,

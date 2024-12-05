@@ -1,81 +1,45 @@
-import { useState } from "react";
+import { Box, Button, styled } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { Button, Card, Grid, styled, TextField } from "@mui/material";
 
 // STYLED COMPONENTS
-const StyledRoot = styled("div")(() => ({
+const FlexBox = styled(Box)({
   display: "flex",
+  alignItems: "center"
+});
+
+const JustifyBox = styled(FlexBox)({
+  maxWidth: 320,
+  flexDirection: "column",
+  justifyContent: "center"
+});
+
+const IMG = styled("img")({
+  width: "100%",
+  marginBottom: "32px"
+});
+
+const NotFoundRoot = styled(FlexBox)({
+  width: "100%",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#1A2038",
-  minHeight: "100vh !important",
+  height: "100vh !important"
+});
 
-  "& .card": {
-    maxWidth: 800,
-    margin: "1rem",
-    borderRadius: 12
-  },
-
-  ".img-wrapper": {
-    display: "flex",
-    padding: "2rem",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-}));
-
-const ContentBox = styled("div")(({ theme }) => ({
-  padding: 32,
-  background: theme.palette.background.default
-}));
-
-export default function ForgotPassword() {
+export default function NotFound() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-
-  const handleFormSubmit = () => {
-  };
 
   return (
-    <StyledRoot>
-      <Card className="card">
-        <Grid container>
-          <Grid item xs={12}>
-            <div className="img-wrapper">
-              <img width="300"
-                style={{ borderRadius: 20 }} src="/assets/images/screening.png" alt="" />
-            </div>
-
-            <ContentBox>
-              <form onSubmit={handleFormSubmit}>
-                <TextField
-                  type="email"
-                  name="email"
-                  size="small"
-                  label="Email"
-                  value={email}
-                  variant="outlined"
-                  onChange={(e) => setEmail(e.target.value)}
-                  sx={{ mb: 3, width: "100%" }}
-                />
-
-                <Button fullWidth variant="contained" color="primary" type="submit">
-                  Reset Password
-                </Button>
-
-                <Button
-                  fullWidth
-                  color="primary"
-                  variant="outlined"
-                  onClick={() => navigate(-1)}
-                  sx={{ mt: 2 }}>
-                  Go Back
-                </Button>
-              </form>
-            </ContentBox>
-          </Grid>
-        </Grid>
-      </Card>
-    </StyledRoot>
+    <NotFoundRoot>
+      <JustifyBox>
+        <IMG src="/assets/images/illustrate/404-error.png" alt="" />
+        <Button
+          color="primary"
+          variant="contained"
+          sx={{ textTransform: "capitalize" }}
+          onClick={() => navigate(-1)}>
+          Contact Admin
+        </Button>
+      </JustifyBox>
+    </NotFoundRoot>
   );
 }

@@ -14,8 +14,8 @@ const BrandRoot = styled(Box)(() => ({
 
 const StyledSpan = styled(Span)(({ theme, mode }) => ({
   fontSize: 20,
-  fontFamily: 'Helvetica, Arial, sans-serif', // Added Helvetica font
-  background: `linear-gradient(95deg, ${theme.palette.secondary.main}, ${'#E53935'})`,
+  fontFamily: 'Helvetica, Arial, sans-serif', 
+  background: `linear-gradient(95deg, ${theme.palette.secondary.main}, ${'#3BC659'})`,
   WebkitBackgroundClip: "text",
   WebkitTextFillColor: "transparent",
   marginLeft: ".5rem",
@@ -45,7 +45,7 @@ export default function Brand({ children }) {
         <Box display="flex" alignItems="center">
           <Logo />
           <StyledSpan mode={mode} className="sidenavHoverShow">
-            Deep Eye
+            Poultry Hub
           </StyledSpan>
         </Box>
       </BrandRoot>

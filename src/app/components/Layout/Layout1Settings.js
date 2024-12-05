@@ -2,7 +2,7 @@ const Layout1Settings = {
   leftSidebar: {
     show: true,
     mode: "full", 
-    theme: "slateDark2",
+    theme: "whitePurple",
   },
   topbar: {
     show: true,

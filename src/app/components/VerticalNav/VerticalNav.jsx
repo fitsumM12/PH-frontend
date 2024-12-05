@@ -39,6 +39,7 @@ const ExtAndIntCommon = {
     verticalAlign: "middle"
   }
 };
+
 const ExternalLink = styled("a")(({ theme }) => ({
   ...ExtAndIntCommon,
   color: theme.palette.text.primary
@@ -103,17 +104,15 @@ export default function VerticalNav({ items }) {
             rel="noopener noreferrer"
             target="_blank">
             <ButtonBase key={item.name} name="child" sx={{ width: "100%" }}>
-              {(() => {
-                if (item.icon) {
-                  return <Icon className="icon">{item.icon}</Icon>;
-                } else {
-                  return <span className="item-icon icon-text">{item.iconText}</span>;
-                }
-              })()}
+              {item.icon ? (
+                <Icon className="icon">{item.icon}</Icon>
+              ) : (
+                <span className="item-icon icon-text">{item.iconText}</span>
+              )}
               <StyledText mode={mode} className="sidenavHoverShow">
                 {item.name}
               </StyledText>
-              <Box mx="auto"></Box>
+              <Box mx="auto" />
               {item.badge && <BadgeValue>{item.badge.value}</BadgeValue>}
             </ButtonBase>
           </ExternalLink>
@@ -129,7 +128,7 @@ export default function VerticalNav({ items }) {
                   : `${mode === "compact" && "compactNavItem"}`
               }>
               <ButtonBase key={item.name} name="child" sx={{ width: "100%" }}>
-                {item?.icon ? (
+                {item.icon ? (
                   <Icon className="icon" sx={{ width: 36 }}>
                     {item.icon}
                   </Icon>

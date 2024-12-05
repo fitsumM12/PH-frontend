@@ -1,10 +1,10 @@
 import { Box, Card, Grid, styled } from "@mui/material";
-import { Group, LocalHospital } from "@mui/icons-material";
+import { Home, PetsRounded } from "@mui/icons-material";
 import { Small } from "app/components/Typography";
-import { fetchPatientForDoctor, getPatientsCount } from "app/apis/patients_api";
-import useAuth from "app/hooks/useAuth";
+import { getBreeds, getHouses } from "app/apis/chicken_api";
+import { getChickens } from "app/apis/individual_chicken_api";
+import { getGroupChickens } from "app/apis/group_chicken_api";
 import { useEffect, useState } from "react";
-import { get_institution_count } from "app/apis/users_api";
 
 // STYLED COMPONENTS
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -21,13 +21,13 @@ const StyledCard = styled(Card)(({ theme }) => ({
 
 const ContentBox = styled(Box)(({ theme }) => ({
   display: "flex",
-  flexDirection: "row", 
+  flexDirection: "row",
   alignItems: "center",
   "& small": { color: theme.palette.text.secondary },
   "& .icon": {
     opacity: 0.8,
     fontSize: "44px",
-    marginRight: "16px", 
+    marginRight: "16px",
   },
 }));
 
@@ -40,53 +40,47 @@ const Heading = styled("h2")(({ theme }) => ({
 }));
 
 // MAIN COMPONENT
-export default function StatCards() {
-  const [institution, setInstitution] = useState(0);
-  const [normalCount, setNormalCount] = useState(0);
-  const [abnormalCount, setAbnormalCount] = useState(0);
-  const [totalCount, setTotalCount] = useState(0);
-  const { user } = useAuth();
-
+export const StatCards = ()=> {
+  const [chickens, setChickens] = useState(0);
+  const [groupChickens, setGroupChickens] = useState(0);
+  const [breeds, setBreeds] = useState(0);
+  const [houses, setHouses] = useState(0);
+console.log(chickens)
   useEffect(() => {
-    const fetchCount = async () => {
+    const fetchCounts = async () => {
       try {
-        const response = await getPatientsCount();
-        setTotalCount(response.total_patients_count);
-        setNormalCount(response.normal_patients_count);
-        setAbnormalCount(response.abnormal_patients_count);
+        const chickenData = await getChickens();
+        setChickens(Array.isArray(chickenData) ? chickenData.length : 0);
+
+        const groupData = await getGroupChickens();
+        setGroupChickens(Array.isArray(groupData) ? groupData.length : 0);
+
+        const breedData = await getBreeds();
+        setBreeds(Array.isArray(breedData) ? breedData.length : 0);
+
+        const houseData = await getHouses();
+        setHouses(Array.isArray(houseData) ? houseData.length : 0);
       } catch (error) {
-        console.log(error);
+        console.error("Error fetching data:", error);
       }
     };
-    fetchCount();
-  }, []);
-
-  useEffect(() => {
-    const fetchInstitutionCount = async () => {
-      try {
-        const response = await get_institution_count();
-        setInstitution(response.institution_count);
-      } catch (error) {
-        console.error("Error fetching institution count:", error);
-      }
-    };
-
-    fetchInstitutionCount();
+    fetchCounts();
   }, []);
 
   const cardList = [
-    { name: "Hospitals", amount: institution, Icon: LocalHospital, color: "#1E88E5" },
-    { name: "Total", amount: totalCount, Icon: Group, color: "#43A047" },
-    { name: "Normal", amount: normalCount, Icon: Group, color: "#FB8C00" },
-    { name: "Abnormal", amount: abnormalCount, Icon: Group, color: "#E53935" },
+    { name: "Experimental", amount: chickens, Icon: PetsRounded, color: "#43A047" },
+    { name: "Groups", amount: groupChickens, Icon: PetsRounded, color: "#FB8C00" },
+    { name: "Breeds", amount: breeds, Icon: PetsRounded, color: "#E53935" },
+    { name: "Houses", amount: houses, Icon: Home, color: "#1E88E5" },
   ];
 
   return (
-    <Grid container spacing={4} sx={{ mb: "24px" }}>
+    <Grid container spacing={2} sx={{ mb: "24px" }}>
       {cardList.map(({ amount, Icon, name, color }) => (
-        <Grid item xs={6} md={3} lg={3} key={name}>
-          <StyledCard elevation={6}>
+        <Grid item xs={6} md={6} lg={6} key={name}>
+          <StyledCard elevation={2}>
             <ContentBox>
+              
               <Icon className="icon" style={{ color }} />
               <Box>
                 <Heading>{amount}</Heading>

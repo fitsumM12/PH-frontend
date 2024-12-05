@@ -41,7 +41,7 @@ export default function Footer() {
       <AppBar color="primary" position="relative" sx={{ zIndex: 96 }}>
         <AppFooter>
           <FooterContent>
-            &copy; Ethiopian Artificial Intelligence Institute
+            Ethiopian Artificial Intelligence Institute (EAII) &copy;  2024
             <Span m="auto"></Span>
           </FooterContent>
         </AppFooter>
