@@ -118,7 +118,6 @@ const ViewChickenDistribution = () => {
         return breed ? `${breed.name}` : 'Unknown Breed';
     };
 
-
     const getRequesterDetails = (id) => {
         const requester = requesters.find((r) => r.id === id);
         return requester ? `${requester.requester_name}` : 'no Requester';
@@ -138,7 +137,6 @@ const ViewChickenDistribution = () => {
             console.log('Deletion cancelled');
         }
     };
-
 
     const handleChangePage = (_, newPage) => {
         setPage(newPage);
@@ -199,8 +197,6 @@ const ViewChickenDistribution = () => {
             console.error('Error updating chickendistribution:', error);
         }
     };
-
-
 
     const handleDownLoad = () => {
         const fetchChickenDistributions = async () => {
@@ -356,47 +352,26 @@ const ViewChickenDistribution = () => {
 
                                 <br />
                                 <br />
-                                {/* <FormControl variant="outlined" fullWidth >
-                                    <InputLabel id="requester-label">Requester</InputLabel>
-                                    <Select
-                                        labelId="requester-label"
-                                        name="requester"
-                                        value={chickendistribution.requester}
-                                        onChange={handleChangeEdit}
-                                        label="requester"
-                                        required
-                                    >
-                                        {requesters.map((requester) => (
-                                            <MenuItem key={requester.id} value={requester.id}>
-                                                {requester.requester_name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl> */}
 
 
-{/* import { Autocomplete, TextField, FormControl } from '@mui/material'; */}
-
-{/* // Your existing state and effect hooks */}
-
-<FormControl variant="outlined" fullWidth>
-    <Autocomplete
-        options={requesters}
-        getOptionLabel={(requester) => requester.requester_name}
-        renderInput={(params) => (
-            <TextField 
-                {...params} // Spreads the necessary props from Autocomplete
-                label="Requester" // Sets the label for the TextField
-                variant="outlined" // Applies the outlined style to the TextField
-            />
-        )}
-        value={requesters.find(requester => requester.id === chickendistribution.requester) || null}
-        onChange={(event, newValue) => {
-            handleChangeEdit({ target: { name: 'requester', value: newValue ? newValue.id : '' } });
-        }}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-    />
-</FormControl>
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={requesters}
+                                        getOptionLabel={(requester) => requester.requester_name}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Requester"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        value={requesters.find(requester => requester.id === chickendistribution.requester) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChangeEdit({ target: { name: 'requester', value: newValue ? newValue.id : '' } });
+                                        }}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                    />
+                                </FormControl>
 
                                 <br />
                                 <br />
