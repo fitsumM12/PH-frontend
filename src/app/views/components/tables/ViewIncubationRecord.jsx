@@ -76,18 +76,6 @@ const ViewIncubationRecord = () => {
   const [formData, setFormData] = useState(initialFormData);
   const [breeds, setBreeds] = useState([]);
   const [hatcheryRecords, setHatcheryRecords] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchIncubationRecords = async () => {
-  //     try {
-  //       const hacheryData = await getIncubationRecords();
-  //       setIncubationRecords(hacheryData);
-  //     } catch (error) {
-  //       console.error("Error fetching fetchIncubationRecords:", error);
-  //     }
-  //   };
-  //   fetchIncubationRecords();
-  // }, [add, del, edit]);
   useEffect(() => {
     const fetchIncubationRecords = async () => {
       try {
@@ -99,8 +87,6 @@ const ViewIncubationRecord = () => {
     };
     fetchIncubationRecords();
   }, [add, del, edit]);
-  
-  // Filter Incubation Records based on User Role
   useEffect(() => {
     if (user.role === "USER") {
       const filteredData = incubationRecords.filter(item => item.collector === user.id);
@@ -317,8 +303,6 @@ const ViewIncubationRecord = () => {
                       {record.humidity_percentage}
                     </TableCell>
                     <TableCell align="center">{record.co2_level}</TableCell>
-                    {/* <TableCell align="center">{record.valve_status}</TableCell>
-                    <TableCell align="center">{record.turning}</TableCell> */}
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <IconButton
@@ -341,9 +325,9 @@ const ViewIncubationRecord = () => {
                         </Tooltip>
                       )}
                     </TableCell>
-                    
+
                     {user.role !== "USER" ? (
-                                        <TableCell align="center"></TableCell>) : (null)}
+                      <TableCell align="center"></TableCell>) : (null)}
                   </TableRow>
                 ))}
             </TableBody>
@@ -382,26 +366,24 @@ const ViewIncubationRecord = () => {
                 errorMessages={["This field is required"]}
               />
               <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Hatchery Record</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="hatchery_record"
-                  value={incubationRecord.hatchery_record}
-                  onChange={handleChangeEdit}
-                  label="Hatchery Record"
-                  required
-                >
-                  {hatcheryRecords.map((hatch) => (
-                    <MenuItem key={hatch.id} value={hatch.id}>
-                      {hatch.id +
-                        ": " +
-                        getBreedDetails(hatch.breed_of_chicken) +
-                        ": " +
-                        hatch.date_of_transfer}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  options={hatcheryRecords}
+                  getOptionLabel={(hatch) => `${hatch.id}: ${getBreedDetails(hatch.breed_of_chicken)}: ${hatch.date_of_transfer}`}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Hatchery Record"
+                      variant="outlined"
+                    />
+                  )}
+                  value={hatcheryRecords.find(hatch => hatch.id === incubationRecord.hatchery_record) || null}
+                  onChange={(event, newValue) => {
+                    handleChangeEdit({ target: { name: 'hatchery_record', value: newValue ? newValue.id : '' } });
+                  }}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
               </FormControl>
+
 
               <br />
               <br />
@@ -531,28 +513,28 @@ const ViewIncubationRecord = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-  <FormControl variant="outlined" fullWidth>
-  <Autocomplete
-    options={hatcheryRecords}  // Array of hatchery records
-    getOptionLabel={(option) => 
-      `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${option.date_of_transfer}`
-    }  // Display hatchery record details
-    onChange={(event, value) => {
-      setFormData({
-        ...formData,
-        hatchery_record: value?.id || "",  // Set the hatchery_record ID in formData
-      });
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        label="Select Hatchery Record"
-        variant="outlined"
-        required
-      />
-    )}
-  />
-</FormControl>
+              <FormControl variant="outlined" fullWidth>
+                <Autocomplete
+                  options={hatcheryRecords}  // Array of hatchery records
+                  getOptionLabel={(option) =>
+                    `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${option.date_of_transfer}`
+                  }  // Display hatchery record details
+                  onChange={(event, value) => {
+                    setFormData({
+                      ...formData,
+                      hatchery_record: value?.id || "",  // Set the hatchery_record ID in formData
+                    });
+                  }}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Hatchery Record"
+                      variant="outlined"
+                      required
+                    />
+                  )}
+                />
+              </FormControl>
 
 
               <br />

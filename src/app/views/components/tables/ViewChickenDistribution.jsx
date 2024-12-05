@@ -336,7 +336,7 @@ const ViewChickenDistribution = () => {
                                 />
 
 
-                                <FormControl variant="outlined" fullWidth >
+                                {/* <FormControl variant="outlined" fullWidth >
                                     <InputLabel id="breed-label">Breed</InputLabel>
                                     <Select
                                         labelId="breed-label"
@@ -352,7 +352,30 @@ const ViewChickenDistribution = () => {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                </FormControl>
+                                </FormControl> */}
+                                {/* import { Autocomplete, TextField, FormControl } from '@mui/material'; */}
+
+{/* // Your existing state and effect hooks */}
+
+<FormControl variant="outlined" fullWidth>
+    <Autocomplete
+        options={breeds}
+        getOptionLabel={(breed) => breed.name}
+        renderInput={(params) => (
+            <TextField 
+                {...params} // Spreads the necessary props from Autocomplete
+                label="Breed" // Sets the label for the TextField
+                variant="outlined" // Applies the outlined style to the TextField
+            />
+        )}
+        value={breeds.find(breed => breed.id === chickendistribution.breed) || null}
+        onChange={(event, newValue) => {
+            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
+        }}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+    />
+</FormControl>
+
                                 <br />
                                 <br />
                                 <FormControl variant="outlined" fullWidth >
