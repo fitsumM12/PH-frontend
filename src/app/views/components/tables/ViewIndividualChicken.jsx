@@ -89,7 +89,7 @@ const ViewIndividualChicken = () => {
     const [searchQuery, setSearchQuery] = useState('');
     // const [chickens, setChickens] = useState([]);
     const [filteredChickensForUser, setFilteredChickensForUser] = useState([]);
-    
+
     useEffect(() => {
         const fetchChickens = async () => {
             try {
@@ -101,7 +101,7 @@ const ViewIndividualChicken = () => {
         };
         fetchChickens();
     }, [add, del, edit]);
-    
+
     // Filter Chickens based on User Role
     useEffect(() => {
         if (user.role === "USER") {
@@ -111,7 +111,7 @@ const ViewIndividualChicken = () => {
             setFilteredChickensForUser(chickens);
         }
     }, [chickens, user]);
-    
+
 
     useEffect(() => {
         const fetchBreeds = async () => {
@@ -262,7 +262,7 @@ const ViewIndividualChicken = () => {
     const filteredchickens = filteredChickensForUser.filter((chicken) =>
         String(chicken.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
     );
-
+    // const [searchQuery, setSearchQuery]= useState("") 
 
     return (
         <>
@@ -347,42 +347,44 @@ const ViewIndividualChicken = () => {
                     <ValidatorForm onSubmit={handleUpdateChicken} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <FormControl variant="outlined" fullWidth >
-                                    <InputLabel id="breed-label">Breed</InputLabel>
-                                    <Select
-                                        labelId="breed-label"
-                                        name="breed"
-                                        value={chicken.breed}
-                                        onChange={handleChangeEdit}
-                                        label="Breed"
-                                        required
-                                    >
-                                        {breeds.map((breed) => (
-                                            <MenuItem key={breed.id} value={breed.id}>
-                                                {breed.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
+
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={breeds}
+                                        getOptionLabel={(option) => option.name}
+                                        renderInput={(params) => <TextField {...params} label="Breed" variant="outlined" />}
+                                        value={breeds.find(breed => breed.id === chicken.breed) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
+                                        }}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                    />
                                 </FormControl>
+
                                 <br />
                                 <br />
-                                <FormControl variant="outlined" fullWidth >
-                                    <InputLabel id="house-label">House</InputLabel>
-                                    <Select
-                                        labelId="house-label"
-                                        name="house"
-                                        value={chicken.house}
-                                        onChange={handleChangeEdit}
-                                        label="House"
-                                        required
-                                    >
-                                        {houses.map((house) => (
-                                            <MenuItem key={house.id} value={house.id}>
-                                                {house.house_number + ' ' + house.pen_number}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
+
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={houses}
+                                        getOptionLabel={(house) => house.house_number + ' ' + house.pen_number}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="House"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        value={houses.find(house => house.id === chicken.house) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChangeEdit({ target: { name: 'house', value: newValue ? newValue.id : '' } });
+                                        }}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                    />
                                 </FormControl>
+
                                 <br />
                                 <br />
                                 <TextField
@@ -532,56 +534,56 @@ const ViewIndividualChicken = () => {
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
 
-<FormControl variant="outlined" fullWidth>
-  <Autocomplete
-    options={breeds}
-    getOptionLabel={(option) =>
-      `ID: ${option.id}, Name: ${option.name}`
-    }
-    onChange={(event, value) => {
-      setFormData({
-        ...formData,
-        breed: value?.id || "",  // Set the breed ID in formData
-      });
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        label="Select Breed"
-        variant="outlined"
-        required
-      />
-    )}
-  />
-</FormControl>
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={breeds}
+                                        getOptionLabel={(option) =>
+                                            `ID: ${option.id}, Name: ${option.name}`
+                                        }
+                                        onChange={(event, value) => {
+                                            setFormData({
+                                                ...formData,
+                                                breed: value?.id || "",  // Set the breed ID in formData
+                                            });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Breed"
+                                                variant="outlined"
+                                                required
+                                            />
+                                        )}
+                                    />
+                                </FormControl>
 
 
                                 <br />
                                 <br />
-                           
 
-<FormControl variant="outlined" fullWidth>
-  <Autocomplete
-    options={houses}
-    getOptionLabel={(option) =>
-      `House: ${option.house_number}, Pen: ${option.pen_number}`
-    }
-    onChange={(event, value) => {
-      setFormData({
-        ...formData,
-        house: value?.id || "",  // Set the house ID in formData
-      });
-    }}
-    renderInput={(params) => (
-      <TextField
-        {...params}
-        label="Select House"
-        variant="outlined"
-        required
-      />
-    )}
-  />
-</FormControl>
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={houses}
+                                        getOptionLabel={(option) =>
+                                            `House: ${option.house_number}, Pen: ${option.pen_number}`
+                                        }
+                                        onChange={(event, value) => {
+                                            setFormData({
+                                                ...formData,
+                                                house: value?.id || "",
+                                            });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select House"
+                                                variant="outlined"
+                                                required
+                                            />
+                                        )}
+                                    />
+                                </FormControl>
 
                                 <br />
                                 <br />
