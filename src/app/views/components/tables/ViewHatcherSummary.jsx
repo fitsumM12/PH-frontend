@@ -332,48 +332,47 @@ const ViewHatcherSummary = () => {
         <ValidatorForm onSubmit={handleUpdateHatcherySummary} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Hatchery Record</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="hatchery_record"
-                  value={hatcherySummary.hatchery_record}
-                  onChange={handleChangeEdit}
-                  label="Hatchery Record"
-                  required
-                >
-                  {hatcheryRecords.map((hatch) => (
-                    <MenuItem key={hatch.id} value={hatch.id}>
-                      {hatch.id +
-                        ": " +
-                        getBreedDetails(hatch.breed_of_chicken) +
-                        ": " +
-                        hatch.date_of_transfer}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
 
-              <br />
-              <br />
 
               <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Breed</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="breed_of_chicken"
-                  value={hatcherySummary.breed_of_chicken}
-                  onChange={handleChangeEdit}
-                  label="Hatchery Record"
-                  required
-                >
-                  {breeds.map((breed) => (
-                    <MenuItem key={breed.id} value={breed.id}>
-                      {getBreedDetails(breed.id)}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <Autocomplete
+                  options={hatcheryRecords}
+                  getOptionLabel={(hatch) => `${hatch.id}: ${getBreedDetails(hatch.breed_of_chicken)}: ${hatch.date_of_transfer}`}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Hatchery Record"
+                      variant="outlined"
+                    />
+                  )}
+                  value={hatcheryRecords.find(hatch => hatch.id === hatcherySummary.hatchery_record) || null}
+                  onChange={(event, newValue) => {
+                    handleChangeEdit({ target: { name: 'hatchery_record', value: newValue ? newValue.id : '' } });
+                  }}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
               </FormControl>
+              <br />
+              <br />
+              <FormControl variant="outlined" fullWidth>
+                <Autocomplete
+                  options={breeds}
+                  getOptionLabel={(breed) => getBreedDetails(breed.id)}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Breed"
+                      variant="outlined"
+                    />
+                  )}
+                  value={breeds.find(breed => breed.id === hatcherySummary.breed_of_chicken) || null}
+                  onChange={(event, newValue) => {
+                    handleChangeEdit({ target: { name: 'breed_of_chicken', value: newValue ? newValue.id : '' } });
+                  }}
+                  isOptionEqualToValue={(option, value) => option.id === value.id}
+                />
+              </FormControl>
+
 
               <br />
               <br />
@@ -491,22 +490,21 @@ const ViewHatcherSummary = () => {
                     return !hatcherySummarys.some(
                       (summary) => summary.hatchery_record === hatch.id
                     );
-                  })} // Filter out hatchery records that are attached to a summary
+                  })}
                   getOptionLabel={(option) =>
-                    `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${
-                      option.date_of_transfer
+                    `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${option.date_of_transfer
                     }`
-                  } // Display hatchery record details
+                  }
                   value={
                     hatcheryRecords.find((hatch) => hatch.id === formData.hatchery_record) || null
-                  } // Bind the correct value
+                  }
                   onChange={(event, value) => {
                     setFormData({
                       ...formData,
-                      hatchery_record: value?.id || "" // Set the hatchery_record ID in formData
+                      hatchery_record: value?.id || ""
                     });
                   }}
-                  noOptionsText="All records are attached to the summary. Please go back and edit if needed." // Text to show when no options are available
+                  noOptionsText="All records are attached to the summary. Please go back and edit if needed."
                   renderInput={(params) => (
                     <TextField
                       {...params}
@@ -522,13 +520,13 @@ const ViewHatcherSummary = () => {
 
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
-                  options={breeds} // The list of breeds to choose from
-                  getOptionLabel={(option) => getBreedDetails(option.id)} // Display breed details using the helper function
-                  value={breeds.find((breed) => breed.id === formData.breed_of_chicken) || null} // Bind the selected breed to formData
+                  options={breeds}
+                  getOptionLabel={(option) => getBreedDetails(option.id)}
+                  value={breeds.find((breed) => breed.id === formData.breed_of_chicken) || null}
                   onChange={(event, value) => {
                     setFormData({
                       ...formData,
-                      breed_of_chicken: value?.id || "" // Update the formData with the selected breed ID
+                      breed_of_chicken: value?.id || ""
                     });
                   }}
                   renderInput={(params) => (
