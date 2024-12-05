@@ -365,7 +365,6 @@ const ViewIndividualChicken = () => {
                                 <br />
                                 <br />
 
-
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
                                         options={houses}
