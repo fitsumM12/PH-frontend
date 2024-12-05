@@ -58,7 +58,7 @@ const ViewChickenDistribution = () => {
         number_of_eggs_incubated: 0,
         date_of_hatch: "",
         requester: 0,
-        distributor_name: user.id,  
+        distributor_name: user.id,
     };
     const initialFormDataForMortality = {
         id: 0,
@@ -335,50 +335,28 @@ const ViewChickenDistribution = () => {
                                     errorMessages={["This field is required"]}
                                 />
 
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={breeds}
+                                        getOptionLabel={(breed) => breed.name}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Breed"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        value={breeds.find(breed => breed.id === chickendistribution.breed) || null}
+                                        onChange={(event, newValue) => {
+                                            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
+                                        }}
+                                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                                    />
+                                </FormControl>
 
+                                <br />
+                                <br />
                                 {/* <FormControl variant="outlined" fullWidth >
-                                    <InputLabel id="breed-label">Breed</InputLabel>
-                                    <Select
-                                        labelId="breed-label"
-                                        name="breed"
-                                        value={chickendistribution.breed}
-                                        onChange={handleChangeEdit}
-                                        label="Breed"
-                                        required
-                                    >
-                                        {breeds.map((breed) => (
-                                            <MenuItem key={breed.id} value={breed.id}>
-                                                {breed.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl> */}
-                                {/* import { Autocomplete, TextField, FormControl } from '@mui/material'; */}
-
-{/* // Your existing state and effect hooks */}
-
-<FormControl variant="outlined" fullWidth>
-    <Autocomplete
-        options={breeds}
-        getOptionLabel={(breed) => breed.name}
-        renderInput={(params) => (
-            <TextField 
-                {...params} // Spreads the necessary props from Autocomplete
-                label="Breed" // Sets the label for the TextField
-                variant="outlined" // Applies the outlined style to the TextField
-            />
-        )}
-        value={breeds.find(breed => breed.id === chickendistribution.breed) || null}
-        onChange={(event, newValue) => {
-            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
-        }}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-    />
-</FormControl>
-
-                                <br />
-                                <br />
-                                <FormControl variant="outlined" fullWidth >
                                     <InputLabel id="requester-label">Requester</InputLabel>
                                     <Select
                                         labelId="requester-label"
@@ -394,7 +372,32 @@ const ViewChickenDistribution = () => {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                </FormControl>
+                                </FormControl> */}
+
+
+{/* import { Autocomplete, TextField, FormControl } from '@mui/material'; */}
+
+{/* // Your existing state and effect hooks */}
+
+<FormControl variant="outlined" fullWidth>
+    <Autocomplete
+        options={requesters}
+        getOptionLabel={(requester) => requester.requester_name}
+        renderInput={(params) => (
+            <TextField 
+                {...params} // Spreads the necessary props from Autocomplete
+                label="Requester" // Sets the label for the TextField
+                variant="outlined" // Applies the outlined style to the TextField
+            />
+        )}
+        value={requesters.find(requester => requester.id === chickendistribution.requester) || null}
+        onChange={(event, newValue) => {
+            handleChangeEdit({ target: { name: 'requester', value: newValue ? newValue.id : '' } });
+        }}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+    />
+</FormControl>
+
                                 <br />
                                 <br />
 
@@ -504,7 +507,7 @@ const ViewChickenDistribution = () => {
                                         onChange={(event, value) => {
                                             setFormData({
                                                 ...formData,
-                                                breed: value?.id || "",  
+                                                breed: value?.id || "",
                                             });
                                         }}
                                         renderInput={(params) => (
@@ -523,13 +526,13 @@ const ViewChickenDistribution = () => {
 
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
-                                        options={requesters} 
-                                        getOptionLabel={(option) => option.requester_name} 
-                                        value={requesters.find(requester => requester.id === formData.requester) || null}  
+                                        options={requesters}
+                                        getOptionLabel={(option) => option.requester_name}
+                                        value={requesters.find(requester => requester.id === formData.requester) || null}
                                         onChange={(event, value) => {
                                             setFormData({
                                                 ...formData,
-                                                requester: value?.id || "", 
+                                                requester: value?.id || "",
                                             });
                                         }}
                                         renderInput={(params) => (
