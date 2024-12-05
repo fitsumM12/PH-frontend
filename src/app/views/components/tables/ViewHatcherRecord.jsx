@@ -346,7 +346,7 @@ const ViewHactheryRecord = () => {
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
-              <FormControl variant="outlined" fullWidth>
+              {/* <FormControl variant="outlined" fullWidth>
                 <InputLabel id="breed-label">Breed</InputLabel>
                 <Select
                   labelId="breed-label"
@@ -362,7 +362,31 @@ const ViewHactheryRecord = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
+{/* import { Autocomplete, TextField, FormControl } from '@mui/material'; */}
+
+{/* // Your existing state and effect hooks */}
+
+<FormControl variant="outlined" fullWidth>
+    <Autocomplete
+        options={breeds}
+        getOptionLabel={(breed) => breed.name}
+        renderInput={(params) => (
+            <TextField 
+                {...params} // Spreads the necessary props from Autocomplete
+                label="Breed" // Sets the label for the TextField
+                variant="outlined" // Applies the outlined style to the TextField
+            />
+        )}
+        value={breeds.find(breed => breed.id === hatcheryRecord.breed_of_chicken) || null}
+        onChange={(event, newValue) => {
+            handleChangeEdit({ target: { name: 'breed_of_chicken', value: newValue ? newValue.id : '' } });
+        }}
+        isOptionEqualToValue={(option, value) => option.id === value.id}
+    />
+</FormControl>
+
+              
               <br />
               <br />
               <TextField
