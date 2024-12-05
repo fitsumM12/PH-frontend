@@ -1,7 +1,8 @@
 import { Fragment } from "react";
 import { Grid, styled } from "@mui/material";
-import {StatCards} from "./shared/StatCards";
-import MonthlyTrends from "./shared/MonthlyTrends";
+import StatCards from "./shared/StatCards";
+import { DoctorDoughnut } from "./shared/DoughnutDoctor";
+import MonthlyTrend from "./shared/MonthlyTrend";
 
 // STYLED COMPONENTS
 const ContentBox = styled("div")(({ theme }) => ({
@@ -17,12 +18,12 @@ export default function Analytics() {
     <Fragment>
       <ContentBox className="analytics">
         <Grid container spacing={2}>
-          <Grid item lg={8} md={8} sm={12} xs={12}>
-            <MonthlyTrends/>
+          <Grid item lg={5} md={5} sm={12} xs={12}>
+            <MonthlyTrend />
           </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12}>
+          <Grid item lg={7} md={7} sm={12} xs={12}>
             <StatCards />
-            {/* <DoctorDoughnut /> */}
+            <DoctorDoughnut />
           </Grid>
         </Grid>
       </ContentBox>

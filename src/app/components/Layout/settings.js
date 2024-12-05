@@ -12,12 +12,12 @@ export const LayoutSettings = {
   secondarySidebar: {
     show: true,
     open: false,
-    theme: 'whitePurple'
+    theme: 'slateDark1'
   },
   
   footer: {
     show: true,
     fixed: false,
-    theme: 'whitePurple' 
+    theme: 'slateDark2' 
   }
 };

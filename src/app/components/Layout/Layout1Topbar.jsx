@@ -28,7 +28,7 @@ const TopbarContainer = styled(Box)(({ theme }) => ({
   height: "100%",
   display: "flex",
   alignItems: "center",
-  borderBottom: '1.5px solid #d19a0',
+  borderBottom:'1.5px solid #d19a0',
   justifyContent: "space-between",
   background: theme.palette.primary.main,
   [theme.breakpoints.down("sm")]: { paddingLeft: 16, paddingRight: 16 },
@@ -114,14 +114,14 @@ const Layout1Topbar = () => {
 
         <Box display="flex" alignItems="center">
           <Span>
-            <h4>{user.first_name}</h4>
+            <h5>{user.first_name}</h5>
           </Span>
           <MainMenu
             menuButton={
               <UserMenu>
                 <Hidden xsDown>
                 </Hidden>
-                <AccountCircleIcon style={{ color: '#00004D', height: '30px', width: '30px', margin: 2 }} />
+                <AccountCircleIcon style={{ color: '#00004D', height:'30px', width:'30px', margin:2}} />
 
               </UserMenu>
             }
