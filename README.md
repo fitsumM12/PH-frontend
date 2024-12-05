@@ -14,10 +14,10 @@ git push -uf origin main
 ```
 
 ## Authors and acknowledgment
-The project is designed and developed by fitsum mesfin.
+The project is designed and developed by fitsum mesfin and Miretu Jaleta.
 
 ## License
-Contact: fitse.fani@gmail.com
+Contact: fitse.fani@gmail.com and miratuujaallataa@gmail.com
 
 ## Project status
 deployed
