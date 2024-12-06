@@ -14,7 +14,7 @@ import {
     MenuItem, Select
 } from "@mui/material";
 import { FormControl, InputLabel } from '@mui/material';
-import Autocomplete from '@mui/material/Autocomplete';
+
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
@@ -61,35 +61,23 @@ const ViewGroupChicken = () => {
     const [edit, setEdit] = useState(false)
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [groupChickens, setGroupChickens] = useState([]);
+    const [groupchickens, setGroupChickens] = useState([]);
     const [groupchicken, setGroupChicken] = useState(initialFormData);
     const [formData, setFormData] = useState(initialFormData);
 
     const [breeds, setBreeds] = useState([]);
     const [houses, setHouses] = useState([]);
-    const [filteredGroupChickensForUser, setFilteredGroupChickensForUser] = useState([]);
-
     useEffect(() => {
         const fetchGroupChickens = async () => {
             try {
-                const groupChickensData = await getGroupChickens();
-                setGroupChickens(groupChickensData);
+                const groupchickensData = await getGroupChickens();
+                setGroupChickens(groupchickensData);
             } catch (error) {
-                console.error('Error fetching groupChickens:', error);
+                console.error('Error fetching groupchickens:', error);
             }
         };
         fetchGroupChickens();
     }, [add, del, edit]);
-
-    // Filter Group Chickens based on User Role
-    useEffect(() => {
-        if (user.role === 'USER') {
-            const filteredData = groupChickens.filter(item => item.collector === user.id);
-            setFilteredGroupChickensForUser(filteredData);
-        } else {
-            setFilteredGroupChickensForUser(groupChickens);
-        }
-    }, [groupChickens, user]);
 
 
     useEffect(() => {
@@ -241,7 +229,7 @@ const ViewGroupChicken = () => {
 
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredgroupchickens = filteredGroupChickensForUser.filter((groupchicken) =>
+    const filteredgroupchickens = groupchickens.filter((groupchicken) =>
         String(groupchicken.id).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -328,50 +316,42 @@ const ViewGroupChicken = () => {
                     <ValidatorForm onSubmit={handleUpdateGroupChicken} onError={() => null}>
                         <Grid container spacing={2}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-
-
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={breeds}
-                                        getOptionLabel={(breed) => breed.name}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Breed"
-                                                variant="outlined"
-                                            />
-                                        )}
-                                        value={breeds.find(breed => breed.id === groupchicken.breed) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
-                                        }}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                    />
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="breed-label">Breed</InputLabel>
+                                    <Select
+                                        labelId="breed-label"
+                                        name="breed"
+                                        value={groupchicken.breed}
+                                        onChange={handleChangeEdit}
+                                        label="Breed"
+                                        required
+                                    >
+                                        {breeds.map((breed) => (
+                                            <MenuItem key={breed.id} value={breed.id}>
+                                                {breed.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
-
                                 <br />
                                 <br />
-
-
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={houses}
-                                        getOptionLabel={(house) => `${house.house_number} ${house.pen_number}`}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="House"
-                                                variant="outlined"
-                                            />
-                                        )}
-                                        value={houses.find(house => house.id === groupchicken.house) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChangeEdit({ target: { name: 'house', value: newValue ? newValue.id : '' } });
-                                        }}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                    />
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="house-label">House</InputLabel>
+                                    <Select
+                                        labelId="house-label"
+                                        name="house"
+                                        value={groupchicken.house}
+                                        onChange={handleChangeEdit}
+                                        label="House"
+                                        required
+                                    >
+                                        {houses.map((house) => (
+                                            <MenuItem key={house.id} value={house.id}>
+                                                {house.house_number + ' ' + house.pen_number}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
-
                                 <br />
                                 <br />
                                 <TextField
@@ -464,7 +444,7 @@ const ViewGroupChicken = () => {
                     <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
                         <Grid container spacing={2}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                {/* <FormControl variant="outlined" fullWidth >
+                                <FormControl variant="outlined" fullWidth >
                                     <InputLabel id="breed-label">Breed</InputLabel>
                                     <Select
                                         labelId="breed-label"
@@ -480,54 +460,25 @@ const ViewGroupChicken = () => {
                                             </MenuItem>
                                         ))}
                                     </Select>
-                                </FormControl> */}
-
-
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={breeds}
-                                        getOptionLabel={(option) =>
-                                            `ID: ${option.id}, Name: ${option.name}`
-                                        }
-                                        onChange={(event, value) => {
-                                            setFormData({
-                                                ...formData,
-                                                breed: value?.id || "",  // Set the breed ID in formData
-                                            });
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Select Breed"
-                                                variant="outlined"
-                                                required
-                                            />
-                                        )}
-                                    />
                                 </FormControl>
                                 <br />
                                 <br />
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={houses}
-                                        getOptionLabel={(option) =>
-                                            `House: ${option.house_number}, Pen: ${option.pen_number}`
-                                        }
-                                        onChange={(event, value) => {
-                                            setFormData({
-                                                ...formData,
-                                                house: value?.id || "",  // Set the house ID in formData
-                                            });
-                                        }}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Select House"
-                                                variant="outlined"
-                                                required
-                                            />
-                                        )}
-                                    />
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="house-label">House</InputLabel>
+                                    <Select
+                                        labelId="house-label"
+                                        name="house"
+                                        value={formData.house}
+                                        onChange={handleChange}
+                                        label="House"
+                                        required
+                                    >
+                                        {houses.map((house) => (
+                                            <MenuItem key={house.id} value={house.id}>
+                                                {house.house_number + ' ' + house.pen_number}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
                                 <br />
                                 <br />

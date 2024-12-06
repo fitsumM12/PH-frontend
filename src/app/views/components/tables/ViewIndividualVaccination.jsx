@@ -278,44 +278,21 @@ const ViewIndividualVaccination = () => {
     document.body.removeChild(a);
   }
 
-  const [mergedData, setMergedData] = useState([]);
-  const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
-  
+  const [mergedData, setmergedData] = useState([]);
   useEffect(() => {
-      const mergeData = async () => {
-          try {
-              if (groupchickens.length > 0 && groupVaccines.length > 0) {
-                  const combinedVaccines = groupVaccines.map((vaccine) => {
-                      const chicken = groupchickens.find(
-                          (ch) => ch.id === vaccine.bird
-                      );
-                      return {
-                          ...vaccine,
-                          bird_id: chicken ? chicken.bird_id : "Unknown",
-                          collector: vaccine.collector, // Assuming this exists
-                      };
-                  });
-                  setMergedData(combinedVaccines);
-              }
-          } catch (error) {
-              console.error("Error merging data:", error);
-          }
-      };
-      mergeData();
+    if (groupchickens.length > 0 && groupVaccines.length > 0) {
+      const combinedVaccines = groupVaccines.map((vaccine) => {
+        const chicken = groupchickens.find((ch) => ch.id === vaccine.bird);
+        return {
+          ...vaccine,
+          bird_id: chicken ? chicken.bird_id : "Unknown",
+        };
+      });
+      setmergedData(combinedVaccines);
+    }
   }, [groupVaccines, groupchickens]);
-  
-  // Filter Merged Data based on User Role
-  useEffect(() => {
-      if (user.role === "USER") {
-          const filteredData = mergedData.filter((item) => item.collector === user.id);
-          setFilteredMergedDataForUser(filteredData);
-      } else {
-          setFilteredMergedDataForUser(mergedData);
-      }
-  }, [mergedData, user]);
-  
   const [searchQuery, setSearchQuery] = useState("");
-  const filteredVaccines = filteredMergedDataForUser.filter((vaccine) =>
+  const filteredVaccines = mergedData.filter((vaccine) =>
     String(vaccine.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 

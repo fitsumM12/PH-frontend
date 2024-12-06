@@ -64,48 +64,22 @@ const ViewGroupIntake = () => {
     const [groupintake, setGroupIntake] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [breeds, setBreeds] = useState([]);
-    const [groupIntakes, setGroupIntakes] = useState([]);
+    const [groupintakes, setGroupIntakes] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
-    // useEffect(() => {
-    //     const fetchGroupIntakes = async () => {
-    //         try {
-    //             const groupintakesData = await getGroupIntakes();
-    //             setGroupIntakes(groupintakesData);
-    //         } catch (error) {
-    //             console.error('Error fetching chickens:', error);
-    //         }
-    //     };
-    //     fetchGroupIntakes();
-    // }, [add, del, edit]);
-
-    // const [groupIntakes, setGroupIntakes] = useState([]);
-const [filteredGroupIntakesForUser, setFilteredGroupIntakesForUser] = useState([]);
-
-useEffect(() => {
-    const fetchGroupIntakes = async () => {
-        try {
-            const groupIntakesData = await getGroupIntakes();
-            setGroupIntakes(groupIntakesData);
-        } catch (error) {
-            console.error("Error fetching group intakes:", error);
-        }
-    };
-    fetchGroupIntakes();
-}, [add, del, edit]);
-
-// Filter Group Intakes based on User Role
-useEffect(() => {
-    if (user.role === "USER") {
-        const filteredData = groupIntakes.filter((item) => item.collector === user.id);
-        setFilteredGroupIntakesForUser(filteredData);
-    } else {
-        setFilteredGroupIntakesForUser(groupIntakes);
-    }
-}, [groupIntakes, user]);
-
+    useEffect(() => {
+        const fetchGroupIntakes = async () => {
+            try {
+                const groupintakesData = await getGroupIntakes();
+                setGroupIntakes(groupintakesData);
+            } catch (error) {
+                console.error('Error fetching chickens:', error);
+            }
+        };
+        fetchGroupIntakes();
+    }, [add, del, edit]);
 
 
     useEffect(() => {
@@ -291,7 +265,7 @@ useEffect(() => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredgroupintake = filteredGroupIntakesForUser.filter((intake) =>
+    const filteredgroupintake = groupintakes.filter((intake) =>
         String(getGroupDetails(intake.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

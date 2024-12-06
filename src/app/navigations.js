@@ -25,11 +25,6 @@ export const navigations = [
     path: "/hatcheryunit/",
   },
   {
-  name: "Manage Chicken Distribution",
-  icon: "egg", 
-  path: "/chickendistribution/",
-},
-  {
     name: "Manage Users",
     icon: "people", 
     path: "/manageuser/",

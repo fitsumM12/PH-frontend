@@ -12,11 +12,11 @@ import {
   styled,
   Tooltip,
   MenuItem,
-  Select
+  Select,
 } from "@mui/material";
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { FormControl, InputLabel } from "@mui/material";
-import Autocomplete from "@mui/material/Autocomplete";
+
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
@@ -30,21 +30,21 @@ import {
   deleteHatcherRecord,
   getHatcherRecord,
   getHatcherRecords,
-  updateHatcherRecordInAPI
+  updateHatcherRecordInAPI,
 } from "app/apis/hatchery_unit_api";
 const TextField = styled(TextValidator)(() => ({
   width: "100%",
-  marginBottom: "16px"
+  marginBottom: "16px",
 }));
 
 const StyledTable = styled(Table)(() => ({
   whiteSpace: "pre",
   "& thead": {
-    "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } }
+    "& tr": { "& th": { paddingLeft: 0, paddingRight: 0 } },
   },
   "& tbody": {
-    "& tr": { "& td": { paddingLeft: 0, textTransform: "capitalize" } }
-  }
+    "& tr": { "& td": { paddingLeft: 0, textTransform: "capitalize" } },
+  },
 }));
 
 const ViewHactheryRecord = () => {
@@ -56,11 +56,11 @@ const ViewHactheryRecord = () => {
     date_of_set: new Date().toISOString().split("T")[0],
     hour_of_set: new Date().toLocaleTimeString([], {
       hour: "2-digit",
-      minute: "2-digit"
+      minute: "2-digit",
     }),
     date_of_candling: new Date().toISOString().split("T")[0],
     date_of_transfer: new Date().toISOString().split("T")[0],
-    collector: user.id
+    collector: user.id,
   };
 
   const [add, setAdd] = useState(false);
@@ -68,37 +68,27 @@ const ViewHactheryRecord = () => {
   const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [hatcheryRecord, setHatcheryRecord] = useState([]);
   const [hatcheryRecords, setHatcheryRecords] = useState([]);
+  const [hatcheryRecord, setHatcheryRecord] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
   const [breeds, setBreeds] = useState([]);
-
-  // const [hatcheryRecords, setHatcheryRecords] = useState([]);
-  const [filteredHatcheryRecordsForUser, setFilteredHatcheryRecordsForUser] = useState([]);
 
   useEffect(() => {
     const fetchHatcheryRecords = async () => {
       try {
-        const hatcheryData = await getHatcherRecords();
-        setHatcheryRecords(hatcheryData);
+        const hacheryData = await getHatcherRecords();
+        setHatcheryRecords(hacheryData);
       } catch (error) {
-        console.error("Error fetching hatcheryRecords:", error);
+        console.error("Error fetching fetchHatcheryRecords:", error);
       }
     };
     fetchHatcheryRecords();
   }, [add, del, edit]);
 
-  useEffect(() => {
-    if (user.role === "USER") {
-      const filteredData = hatcheryRecords.filter((item) => item.collector === user.id);
-      setFilteredHatcheryRecordsForUser(filteredData);
-    } else {
-      setFilteredHatcheryRecordsForUser(hatcheryRecords);
-    }
-  }, [hatcheryRecords, user]);
-
   const handleDeleteHatcheryRecords = async (id) => {
-    const confirmed = window.confirm("Are you sure you want to delete this hatchery records?");
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this hatchery records?"
+    );
 
     if (confirmed) {
       try {
@@ -153,13 +143,13 @@ const ViewHactheryRecord = () => {
   const handleChange = (event) => {
     setFormData({
       ...formData,
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
   };
   const handleChangeEdit = (event) => {
     setHatcheryRecord({
       ...hatcheryRecord,
-      [event.target.name]: event.target.value
+      [event.target.name]: event.target.value,
     });
   };
   const handleUpdateHatcheryRecord = async (e) => {
@@ -225,7 +215,7 @@ const ViewHactheryRecord = () => {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
-  const filterrecords = filteredHatcheryRecordsForUser.filter((record) =>
+  const filterrecords = hatcheryRecords.filter((record) =>
     String(record.id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -269,11 +259,19 @@ const ViewHactheryRecord = () => {
                 .map((record, index) => (
                   <TableRow key={index}>
                     <TableCell align="center">{record.id}</TableCell>
-                    <TableCell align="center">{getBreedDetails(record.breed_of_chicken)}</TableCell>
-                    <TableCell align="center">{record.number_of_eggs_set}</TableCell>
+                    <TableCell align="center">
+                      {getBreedDetails(record.breed_of_chicken)}
+                    </TableCell>
+                    <TableCell align="center">
+                      {record.number_of_eggs_set}
+                    </TableCell>
                     <TableCell align="center">{record.date_of_set}</TableCell>
-                    <TableCell align="center">{record.date_of_candling}</TableCell>
-                    <TableCell align="center">{record.date_of_transfer}</TableCell>
+                    <TableCell align="center">
+                      {record.date_of_candling}
+                    </TableCell>
+                    <TableCell align="center">
+                      {record.date_of_transfer}
+                    </TableCell>
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <IconButton
@@ -286,7 +284,9 @@ const ViewHactheryRecord = () => {
                       {user.role !== "USER" && (
                         <Tooltip title="Delete">
                           <IconButton
-                            onClick={() => handleDeleteHatcheryRecords(record.id)}
+                            onClick={() =>
+                              handleDeleteHatcheryRecords(record.id)
+                            }
                             sx={{ "&:hover": { bgcolor: "grey.200" } }}
                           >
                             <DeleteIcon sx={{ color: "red" }} />
@@ -294,8 +294,9 @@ const ViewHactheryRecord = () => {
                         </Tooltip>
                       )}
                     </TableCell>
-
-                    {user.role !== "USER" ? <TableCell align="center"></TableCell> : null}
+                    
+                    {user.role !== "USER" ? (
+                                        <TableCell align="center"></TableCell>) : (null)}
                   </TableRow>
                 ))}
             </TableBody>
@@ -315,7 +316,10 @@ const ViewHactheryRecord = () => {
           />
         </>
       ) : edit === true && add === false ? (
-        <ValidatorForm onSubmit={handleUpdateHatcheryRecord} onError={() => null}>
+        <ValidatorForm
+          onSubmit={handleUpdateHatcheryRecord}
+          onError={() => null}
+        >
           <Grid container spacing={6}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
               <TextField
@@ -325,31 +329,28 @@ const ViewHactheryRecord = () => {
                 onChange={handleChangeEdit}
                 value={hatcheryRecord.id}
                 InputProps={{
-                  readOnly: true
+                  readOnly: true,
                 }}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
-
               <FormControl variant="outlined" fullWidth>
-                <Autocomplete
-                  options={breeds}
-                  getOptionLabel={(breed) => breed.name}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Breed" variant="outlined" />
-                  )}
-                  value={
-                    breeds.find((breed) => breed.id === hatcheryRecord.breed_of_chicken) || null
-                  }
-                  onChange={(event, newValue) => {
-                    handleChangeEdit({
-                      target: { name: "breed_of_chicken", value: newValue ? newValue.id : "" }
-                    });
-                  }}
-                  isOptionEqualToValue={(option, value) => option.id === value.id}
-                />
+                <InputLabel id="breed-label">Breed</InputLabel>
+                <Select
+                  labelId="breed-label"
+                  name="breed_of_chicken"
+                  value={hatcheryRecord.breed_of_chicken}
+                  onChange={handleChangeEdit}
+                  label="Breed"
+                  required
+                >
+                  {breeds.map((breed) => (
+                    <MenuItem key={breed.id} value={breed.id}>
+                      {breed.name}
+                    </MenuItem>
+                  ))}
+                </Select>
               </FormControl>
-
               <br />
               <br />
               <TextField
@@ -417,8 +418,8 @@ const ViewHactheryRecord = () => {
             sx={{
               backgroundColor: "#30BA4E",
               "&:hover": {
-                backgroundColor: "#28A745"
-              }
+                backgroundColor: "#28A745",
+              },
             }}
             variant="contained"
             type="submit"
@@ -430,7 +431,7 @@ const ViewHactheryRecord = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={6}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              {/* <FormControl variant="outlined" fullWidth>
+              <FormControl variant="outlined" fullWidth>
                 <InputLabel id="breed-label">Breed</InputLabel>
                 <Select
                   labelId="breed-label"
@@ -446,24 +447,7 @@ const ViewHactheryRecord = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl> */}
-
-              <FormControl variant="outlined" fullWidth>
-                <Autocomplete
-                  options={breeds} // Array of breeds
-                  getOptionLabel={(option) => `ID : ${option.id} Name: ${option.name}`} // Display breed name
-                  onChange={(event, value) => {
-                    setFormData({
-                      ...formData,
-                      breed_of_chicken: value?.id || "" // Update the breed_of_chicken with selected breed's ID
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Select Breed" variant="outlined" required />
-                  )}
-                />
               </FormControl>
-
               <br />
               <br />
               <TextField
@@ -531,13 +515,15 @@ const ViewHactheryRecord = () => {
             sx={{
               backgroundColor: "#30BA4E",
               "&:hover": {
-                backgroundColor: "#28A745"
-              }
+                backgroundColor: "#28A745",
+              },
             }}
             variant="contained"
             type="submit"
           >
-            <Span sx={{ pl: 1, textTransform: "capitalize" }}>Save and Continue</Span>
+            <Span sx={{ pl: 1, textTransform: "capitalize" }}>
+              Save and Continue
+            </Span>
           </Button>
         </ValidatorForm>
       )}

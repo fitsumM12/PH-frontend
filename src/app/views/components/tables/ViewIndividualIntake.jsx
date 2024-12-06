@@ -65,7 +65,6 @@ const ViewIndividualIntake = () => {
   const [intake, setIntake] = useState(initialFormData);
   const [chickens, setChickens] = useState([]);
   const [intakes, setIntakes] = useState([]);
-  const [filteredintakesforuser, setFilteredintakesforuser] = useState([])
   const [formData, setFormData] = useState(initialFormData);
 
   const [houses, setHouses] = useState([]);
@@ -285,49 +284,21 @@ const ViewIndividualIntake = () => {
     a.click();
     document.body.removeChild(a);
   }
-  
-  const [mergedData, setMergedData] = useState([]);
-  const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
-  
+  const [mergedData, setmergedData] = useState([]);
   useEffect(() => {
-      const mergeData = async () => {
-          try {
-              if (individualchickens.length > 0 && intakes.length > 0) {
-                  const combinedVaccines = intakes.map((intake) => {
-                      const chicken = individualchickens.find(
-                          (ch) => ch.id === intake.bird
-                      );
-                      return {
-                          ...intake,
-                          bird_id: chicken ? chicken.bird_id : "Unknown",
-                          collector: intake.collector, // Assuming this exists
-                      };
-                  });
-                  setMergedData(combinedVaccines);
-              }
-          } catch (error) {
-              console.error("Error merging data:", error);
-          }
-      };
-      mergeData();
+    if (individualchickens.length > 0 && intakes.length > 0) {
+      const combinedVaccines = intakes.map((intake) => {
+        const chicken = individualchickens.find((ch) => ch.id === intake.bird);
+        return {
+          ...intake,
+          bird_id: chicken ? chicken.bird_id : "Unknown",
+        };
+      });
+      setmergedData(combinedVaccines);
+    }
   }, [intakes, individualchickens]);
-  
-  // Filter Merged Data based on User Role
-  useEffect(() => {
-      if (user.role === "USER") {
-          const filteredData = mergedData.filter((item) => item.collector === user.id);
-          setFilteredMergedDataForUser(filteredData);
-      } else {
-          setFilteredMergedDataForUser(mergedData);
-      }
-  }, [mergedData, user]);
-  
-
-
-
-
   const [searchQuery, setSearchQuery] = useState("");
-  const filteredintakes = filteredMergedDataForUser.filter((vaccine) =>
+  const filteredintakes = mergedData.filter((vaccine) =>
     String(vaccine.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
