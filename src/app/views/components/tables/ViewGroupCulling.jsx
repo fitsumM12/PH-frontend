@@ -25,6 +25,7 @@ import { getGroupChickens } from 'app/apis/group_chicken_api';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
 import AuthContext from 'app/contexts/JWTAuthContext';
+import { Alert } from '@mui/material';
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
@@ -68,7 +69,8 @@ const ViewGroupCulling = () => {
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
-
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     useEffect(() => {
         const fetchGroupCullings = async () => {
             try {
@@ -188,15 +190,56 @@ const ViewGroupCulling = () => {
         }
     };
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         await addGroupCulling(formData);
+    //         setAdd(false);
+    //     } catch (error) {
+    //         console.error('Error adding culling:', error);
+    //     }
+    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await addGroupCulling(formData);
-            setAdd(false);
+            const response = await addGroupCulling(formData); // Await the API call
+            console.log('API Response:', response); // Log the response for debugging
+    
+            // Check if the response contains the expected data (e.g., an ID, or status)
+            if (response && response.id) {
+                setMessage('Culling record added successfully!'); // Success message
+                setError('');
+                setAdd(false); // Close the form or modal
+            } else {
+                throw new Error('Unexpected response structure');
+            }
         } catch (error) {
-            console.error('Error adding culling:', error);
+            // Check if the error is an AxiosError
+            if (error.isAxiosError) {
+                console.error('Error submitting form data:', error);
+    
+                // If the error has a response, log the full response
+                if (error.response) {
+                    console.error('Full error response:', error.response);
+    
+                    // Log detailed error response
+                    console.error('Detailed error:', error.response.data);
+                    setError(error.response.data.error || 'An error occurred.');
+                    setMessage('');
+                } else {
+                    // Handle network errors or no response
+                    setError('Network error or no response from server.');
+                    setMessage('');
+                }
+            } else {
+                // Handle other types of errors
+                console.error('Error adding Culling:', error);
+                setError('An unexpected error occurred.');
+                setMessage('');
+            }
         }
     };
+    
 
     const handleBack = () => {
         setAdd(false)
@@ -585,6 +628,8 @@ const ViewGroupCulling = () => {
 
                             </Grid>
                         </Grid>
+                        {message && <Alert severity="success">{message}</Alert>}
+                        {error && <Alert severity="error">{error}</Alert>}
                     </ValidatorForm>
                 )
             )}

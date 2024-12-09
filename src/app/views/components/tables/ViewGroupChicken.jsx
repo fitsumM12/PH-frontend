@@ -25,6 +25,7 @@ import { addGroupChicken, getGroupChicken, deleteGroupChicken, updateGroupChicke
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
 import AuthContext from 'app/contexts/JWTAuthContext';
+// import {message} from './ViewGroupDeath'
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
@@ -238,6 +239,7 @@ const ViewGroupChicken = () => {
             {add === false && edit === false ? (
                 <>
                     <StyledTable>
+                    {/* {message && <p style={{ color: 'green' }}>{message}</p>} */}
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">

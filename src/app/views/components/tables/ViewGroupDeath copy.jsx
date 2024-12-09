@@ -20,13 +20,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Span } from "app/components/Typography";
 import { getBreeds, getHouses } from 'app/apis/chicken_api';
-import { getGroupReplacements, deleteGroupReplacement, addGroupReplacement, updateGroupReplacementInAPI, getGroupReplacement } from 'app/apis/group_chicken_api';
+import { getGroupDeaths, deleteGroupDeath, getGroupDeath, addGroupDeath, updateGroupDeathInAPI } from 'app/apis/group_chicken_api';
 import { getGroupChickens } from 'app/apis/group_chicken_api';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
 import AuthContext from 'app/contexts/JWTAuthContext';
-import { Alert } from '@mui/material';
-
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
@@ -45,7 +43,7 @@ const StyledTable = styled(Table)(() => ({
 }));
 
 
-const ViewGroupReplacement = () => {
+const ViewGroupDeath = () => {
 
     const { user } = useContext(AuthContext);
     const initialFormData = {
@@ -60,29 +58,27 @@ const ViewGroupReplacement = () => {
     };
     const [add, setAdd] = useState(false);
     const [del, setDelete] = useState(true)
-    const [breeds, setBreeds] = useState([]);
     const [edit, setEdit] = useState(false)
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [groupReplacement, setGroupReplacement] = useState(initialFormData);
+    const [groupdeath, setGroupDeath] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
-    const [groupReplacements, setGroupReplacements] = useState([]);
+    const [breeds, setBreeds] = useState([]);
+    const [groupdeaths, setGroupDeaths] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
-    const [message, setMessage] = useState('');
-    const [error, setError] = useState('');
 
     useEffect(() => {
-        const fetchGroupReplacements = async () => {
+        const fetchGroupDeaths = async () => {
             try {
-                const groupReplacementsData = await getGroupReplacements();
-                setGroupReplacements(groupReplacementsData);
+                const groupdeathsData = await getGroupDeaths();
+                setGroupDeaths(groupdeathsData);
             } catch (error) {
-                console.error('Error fetching Replacement:', error);
+                console.error('Error fetching chickens:', error);
             }
         };
-        fetchGroupReplacements();
+        fetchGroupDeaths();
     }, [add, del, edit]);
 
 
@@ -153,15 +149,15 @@ const ViewGroupReplacement = () => {
         }
     }, [houses, groupchickens]);
 
-    const handleDeleteGroupReplacement = async (id) => {
-        const confirmed = window.confirm("Are you sure you want to delete this group Replacement record?");
+    const handleDeleteGroupDeath = async (id) => {
+        const confirmed = window.confirm("Are you sure you want to delete this group death record?");
 
         if (confirmed) {
             try {
-                await deleteGroupReplacement(id);
+                await deleteGroupDeath(id);
                 setDelete(prev => !prev);
             } catch (error) {
-                console.error('Failed to delete the group Replacement record:', error);
+                console.error('Failed to delete the group deaths record:', error);
             }
         } else {
             console.log('Deletion cancelled');
@@ -182,64 +178,25 @@ const ViewGroupReplacement = () => {
         setAdd(true);
         setFormData(initialFormData);
     };
-    const updateGroupReplacement = async (id) => {
+    const updateGroupDeath = async (id) => {
         setEdit(true);
         try {
-            const response = await getGroupReplacement(id);
-            setGroupReplacement(response);
+            const response = await getGroupDeath(id);
+            setGroupDeath(response);
         } catch (error) {
-            console.error('Error fetching Replacement:', error);
+            console.error('Error fetching deaths:', error);
         }
     };
-
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         await addGroupReplacement(formData);
-    //         setAdd(false);
-    //     } catch (error) {
-    //         console.error('Error adding Replacement:', error);
-    //     }
-    // };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            // Await the API call and get the response
-            const response = await addGroupReplacement(formData);
-            
-            // Check if the response contains the data we expect
-            if (response && response.id) { // Assuming `id` is part of the success response
-                setMessage('Replacement record added successfully!'); // Success message
-                setError(''); // Clear any errors
-                setAdd(false); // Close the form or reset state as needed
-            } else {
-                throw new Error('Unexpected response structure'); // Error if the response is not as expected
-            }
+            await addGroupDeath(formData);
+            setAdd(false);
         } catch (error) {
-            // Check if the error is an AxiosError or similar
-            if (error.isAxiosError) {
-                console.error('Error submitting form data:', error);
-    
-                // Check for error response and handle accordingly
-                if (error.response) {
-                    console.error('Full error response:', error.response);
-                    setError(error.response.data.error || 'An error occurred.');
-                    setMessage(''); // Clear success message if error occurs
-                } else {
-                    // Handle network or no response scenario
-                    setError('Network error or no response from server.');
-                    setMessage('');
-                }
-            } else {
-                // Handle other errors
-                console.error('Error adding replacement:', error);
-                setError('An unexpected error occurred.');
-                setMessage('');
-            }
+            console.error('Error adding deaths:', error);
         }
     };
-    
 
     const handleBack = () => {
         setAdd(false)
@@ -252,44 +209,40 @@ const ViewGroupReplacement = () => {
         });
     };
     const handleChangeEdit = (event) => {
-        setGroupReplacement({
-            ...groupReplacement,
+        setGroupDeath({
+            ...groupdeath,
             [event.target.name]: event.target.value,
         });
     };
-    
-
-    const handleUpdateReplacement = async (e) => {
+    const handleUpdateDeath = async (e) => {
         e.preventDefault();
         try {
-            const updatedGroupReplacement= {
-                ...groupReplacement,
-                male_count: parseInt(groupReplacement.male_count, 10),
-                female_count: parseInt(groupReplacement.female_count, 10),
-                total_count: parseInt(groupReplacement.total_count, 10),
+            const updatedGroupDeath = {
+                ...groupdeath,
+                male_count: parseInt(groupdeath.male_count, 10),
+                female_count: parseInt(groupdeath.female_count, 10),
+                total_count: parseInt(groupdeath.total_count, 10),
             };
-            await updateGroupReplacementInAPI(groupReplacement.id, updatedGroupReplacement);
+            await updateGroupDeathInAPI(groupdeath.id, updatedGroupDeath);
     
             setEdit(false);
             setAdd(false);
         } catch (error) {
-            console.error('Error updating replacement:', error);
+            console.error('Error updating deaths:', error);
         }
     };
-
-
-
+    
     const handleDownLoad = () => {
-        const fetchGroupReplacements = async () => {
+        const fetchGroupDeaths = async () => {
             try {
-                const groupReplacementsData = await getGroupReplacements();
-                const csvData = jsonToCsv(groupReplacementsData);
-                downloadCsv(csvData, 'groupreplacementsData.csv');
+                const groupdeathsData = await getGroupDeaths();
+                const csvData = jsonToCsv(groupdeathsData);
+                downloadCsv(csvData, 'groupdeathsData.csv');
             } catch (error) {
                 console.error('Error fetching deaths:', error);
             }
         };
-        fetchGroupReplacements();
+        fetchGroupDeaths();
     };
 
     function jsonToCsv(jsonData) {
@@ -316,8 +269,8 @@ const ViewGroupReplacement = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredReplacements = groupReplacements.filter((Replacement) =>
-        String(getGroupDetails(Replacement.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
+    const filtereddeaths = groupdeaths.filter((death) =>
+        String(getGroupDetails(death.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -339,9 +292,9 @@ const ViewGroupReplacement = () => {
                                         />
                                     </ValidatorForm>
                                 </TableCell>
-                                <TableCell align="center">Female Replace</TableCell>
-                                <TableCell align="center">Male Replaced</TableCell>
-                                <TableCell align="center">Total Replace</TableCell>
+                                <TableCell align="center">Female Death</TableCell>
+                                <TableCell align="center">Male Death</TableCell>
+                                <TableCell align="center">Total Death</TableCell>
                                 <TableCell align="right">
                                     Action | <Button onClick={addNew}>Add New</Button>
                                 </TableCell>
@@ -354,17 +307,17 @@ const ViewGroupReplacement = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredReplacements.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((Replacement, index) => (
+                            {filtereddeaths.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((groudeath, index) => (
                                 <TableRow key={index}>
-                                    <TableCell align="center">{getGroupDetails(Replacement.chicken_group)}</TableCell>
-                                    <TableCell align="center">{Replacement.female_count}</TableCell>
-                                    <TableCell align="center">{Replacement.male_count}</TableCell>
-                                    <TableCell align="center">{Replacement.total_count}</TableCell>
+                                    <TableCell align="center">{getGroupDetails(groudeath.chicken_group)}</TableCell>
+                                    <TableCell align="center">{groudeath.female_count}</TableCell>
+                                    <TableCell align="center">{groudeath.male_count}</TableCell>
+                                    <TableCell align="center">{groudeath.total_count}</TableCell>
                                     <TableCell align="right">
                                         <Tooltip title="Edit">
                                             <IconButton
                                                 onClick={() => {
-                                                    updateGroupReplacement(Replacement.id);
+                                                    updateGroupDeath(groudeath.id);
                                                 }}
                                                 sx={{ '&:hover': { bgcolor: 'grey.200' } }}
                                             >
@@ -375,7 +328,7 @@ const ViewGroupReplacement = () => {
 
 
                                         {user.role !== "USER" ? (<Tooltip title="Delete">
-                                            <IconButton onClick={() => handleDeleteGroupReplacement(Replacement.id)} sx={{ '&:hover': { bgcolor: 'grey.200' } }}>
+                                            <IconButton onClick={() => handleDeleteGroupDeath(groudeath.id)} sx={{ '&:hover': { bgcolor: 'grey.200' } }}>
                                                 <DeleteIcon sx={{ color: 'red' }} />
                                             </IconButton>
                                         </Tooltip>) : (null)}
@@ -392,7 +345,7 @@ const ViewGroupReplacement = () => {
                         page={page}
                         component="div"
                         rowsPerPage={rowsPerPage}
-                        count={filteredReplacements.length}
+                        count={filtereddeaths.length}
                         onPageChange={handleChangePage}
                         rowsPerPageOptions={[5, 10, 25]}
                         onRowsPerPageChange={handleChangeRowsPerPage}
@@ -402,7 +355,7 @@ const ViewGroupReplacement = () => {
                 </>
             ) : (
                 edit === true && add === false ? (
-                    <ValidatorForm onSubmit={handleUpdateReplacement} onError={() => null}>
+                    <ValidatorForm onSubmit={handleUpdateDeath} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <FormControl variant="outlined" fullWidth>
@@ -410,8 +363,8 @@ const ViewGroupReplacement = () => {
                                         options={combinedData}
                                         getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
                                         onChange={(event, value) => {
-                                            setGroupReplacement({
-                                                ...groupReplacement,
+                                            setGroupDeath({
+                                                ...groupdeath,
                                                 chicken_group: value?.id || ''
                                             });
                                         }}
@@ -432,7 +385,7 @@ const ViewGroupReplacement = () => {
                                     name="date"
                                     label="Record Date"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.date}
+                                    value={groupdeath.date}
                                     validators={["required"]}
                                     InputProps={{
                                         readOnly: true,
@@ -444,7 +397,7 @@ const ViewGroupReplacement = () => {
                                     name="collector"
                                     label="Data Collector"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.collector}
+                                    value={formData.collector}
                                     InputProps={{
                                         readOnly: true,
                                     }}
@@ -457,7 +410,7 @@ const ViewGroupReplacement = () => {
                                     name="reason"
                                     label="Reason"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.reason}
+                                    value={groupdeath.reason}
                                 />
                             </Grid>
 
@@ -470,7 +423,7 @@ const ViewGroupReplacement = () => {
                                     name="female_count"
                                     label="Female Count"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.female_count}
+                                    value={groupdeath.female_count}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
@@ -479,7 +432,7 @@ const ViewGroupReplacement = () => {
                                     name="male_count"
                                     label="Male Count"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.male_count}
+                                    value={groupdeath.male_count}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
@@ -488,7 +441,7 @@ const ViewGroupReplacement = () => {
                                     name="total_count"
                                     label="Total Count"
                                     onChange={handleChangeEdit}
-                                    value={groupReplacement.total_count}
+                                    value={groupdeath.total_count}
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
@@ -514,13 +467,12 @@ const ViewGroupReplacement = () => {
                                         Update
                                     </Span>
                                 </Button>
-
                             </Grid>
                         </Grid>
                     </ValidatorForm>
                 ) : (
                     <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-                        <Grid container spacing={6}>
+                        <Grid container spacing={2}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
@@ -549,7 +501,7 @@ const ViewGroupReplacement = () => {
                                     name="date"
                                     label="Record Date"
                                     onChange={handleChange}
-                                    value={formData.date}
+                                    value={groupdeath.date}
                                     validators={["required"]}
                                     InputProps={{
                                         readOnly: true,
@@ -632,11 +584,8 @@ const ViewGroupReplacement = () => {
                                     </Span>
                                 </Button>
 
-
                             </Grid>
                         </Grid>
-                        {message && <Alert severity="success">{message}</Alert>}
-                        {error && <Alert severity="error">{error}</Alert>}
                     </ValidatorForm>
                 )
             )}
@@ -645,4 +594,4 @@ const ViewGroupReplacement = () => {
     );
 }
 
-export default ViewGroupReplacement;
+export default ViewGroupDeath;

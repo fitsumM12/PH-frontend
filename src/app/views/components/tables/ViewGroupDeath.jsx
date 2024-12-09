@@ -25,6 +25,9 @@ import { getGroupChickens } from 'app/apis/group_chicken_api';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
 import AuthContext from 'app/contexts/JWTAuthContext';
+import { Alert } from '@mui/material';
+// import { useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
@@ -68,7 +71,9 @@ const ViewGroupDeath = () => {
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
-
+    // added now 
+    const [message, setMessage] = useState('');
+    const [error, setError] = useState('');
     useEffect(() => {
         const fetchGroupDeaths = async () => {
             try {
@@ -188,15 +193,67 @@ const ViewGroupDeath = () => {
         }
     };
 
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
+    //     try {
+    //         const response = await addGroupDeath(formData);
+    //         setMessage(response.data.message || response.message); // Handle different response structures
+    //         console.log(response)
+    //         setError('');
+    //         setAdd(false);
+    //     } catch (error) {
+    //         // Log entire error response for debugging
+    //         console.error('Full error response:', error.response);
+
+    //         if (error.response && error.response.data) {
+    //             // Log detailed error response to console
+    //             console.error('Detailed error:', error.response.data);
+    //             setError(error.response.data.message || 'An error occurred.');
+    //             setMessage('');
+    //         } else {
+    //             setError('An unexpected error occurred.');
+    //             setMessage('');
+    //         }
+    //         console.error('Error adding deaths:', error);
+    //     }
+    // };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await addGroupDeath(formData);
-            setAdd(false);
+            const response = await addGroupDeath(formData);
+            console.log(response); // Log the response for debugging
+            
+            // Check the response structure
+            if (response && response.data) {
+                setMessage(response.data.message || 'Group death record added successfully!'); // Default success message
+                setError('');
+                setAdd(false);
+            } else {
+                throw new Error('Unexpected response structure');
+            }
         } catch (error) {
+            // Log entire error response for debugging
+            console.error('Full error response:', error.response);
+    
+            if (error.response && error.response.data) {
+                // Log detailed error response to console
+                console.error('Detailed error:', error.response.data);
+                setError(error.response.data.message || 'An error occurred.');
+                setMessage('');
+            } else {
+                setError('An unexpected error occurred.');
+                setMessage('');
+            }
             console.error('Error adding deaths:', error);
         }
     };
+
+
+
+
+    
+
 
     const handleBack = () => {
         setAdd(false)
@@ -586,7 +643,10 @@ const ViewGroupDeath = () => {
 
                             </Grid>
                         </Grid>
+                        {message && <Alert severity="success">{message}</Alert>}
+                        {error && <Alert severity="error">{error}</Alert>}
                     </ValidatorForm>
+
                 )
             )}
         </>
