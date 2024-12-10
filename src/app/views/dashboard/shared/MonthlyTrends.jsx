@@ -353,7 +353,6 @@ const MonthlyTrends = () => {
           </Box>
         </Grid>
       </Grid>
-
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={processGroupChartData}>
           <CartesianGrid strokeDasharray="3 3" />

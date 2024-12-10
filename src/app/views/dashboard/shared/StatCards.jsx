@@ -4,6 +4,9 @@ import { Small } from "app/components/Typography";
 import { getBreeds, getHouses } from "app/apis/chicken_api";
 import { getChickens } from "app/apis/individual_chicken_api";
 import { getGroupChickens } from "app/apis/group_chicken_api";
+import { getIncubationRecords } from "app/apis/hatchery_unit_api";
+import { getHatcherRecord } from "app/apis/hatchery_unit_api";
+import { getHatcherSummarys } from "app/apis/hatchery_unit_api";
 import { useEffect, useState } from "react";
 
 // STYLED COMPONENTS
@@ -45,6 +48,9 @@ export const StatCards = ()=> {
   const [groupChickens, setGroupChickens] = useState(0);
   const [breeds, setBreeds] = useState(0);
   const [houses, setHouses] = useState(0);
+  const [incubations, setIncubations] = useState(0);
+  const [hatcheryUnits, setHatcheryUnits] = useState(0);
+  const [hatcherySummaries, setHatcherySummaries] = useState(0);
 console.log(chickens)
   useEffect(() => {
     const fetchCounts = async () => {
@@ -60,6 +66,20 @@ console.log(chickens)
 
         const houseData = await getHouses();
         setHouses(Array.isArray(houseData) ? houseData.length : 0);
+
+        const incubationData = await getIncubationRecords();
+        setIncubations(Array.isArray(incubationData) ? incubationData.length : 0);
+
+        const hatcheryUnitData = await getHatcherRecord();
+        setHatcheryUnits(Array.isArray(hatcheryUnitData) ? hatcheryUnitData.length : 0);
+
+        const hatcherySummaryData = await getHatcherSummarys();
+        setHatcherySummaries(Array.isArray(hatcherySummaryData) ? hatcherySummaryData.length : 0);
+        
+
+
+        // const incubationData = await getHatcherRecord();
+        // setIncubations(Array.isArray(incubationData) ? incubationData.length : 0);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -72,7 +92,11 @@ console.log(chickens)
     { name: "Groups", amount: groupChickens, Icon: PetsRounded, color: "#FB8C00" },
     { name: "Breeds", amount: breeds, Icon: PetsRounded, color: "#E53935" },
     { name: "Houses", amount: houses, Icon: Home, color: "#1E88E5" },
+    { name: "Incubation ", amount: incubations, Icon: PetsRounded, color: "#FB8C00" },
+    { name: "Hatchery Unit", amount: hatcheryUnits, Icon: PetsRounded, color: "#E53935" },
+    { name: "Hatchery Summary", amount: hatcherySummaries, Icon: Home, color: "#1E88E5" },
   ];
+
 
   return (
     <Grid container spacing={2} sx={{ mb: "24px" }}>
