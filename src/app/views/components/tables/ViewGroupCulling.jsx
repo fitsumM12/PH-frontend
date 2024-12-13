@@ -24,8 +24,8 @@ import { updateGroupDeathInAPI, getGroupCullings, deleteGroupCulling, getGroupCu
 import { getGroupChickens } from 'app/apis/group_chicken_api';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import { useContext } from 'react';
-import AuthContext from 'app/contexts/JWTAuthContext';
 import { Alert } from '@mui/material';
+import AuthContext from 'app/contexts/JWTAuthContext';
 const TextField = styled(TextValidator)(() => ({
     width: "100%",
     marginBottom: "16px",
@@ -66,22 +66,47 @@ const ViewGroupCulling = () => {
     const [groupculling, setGroupCulling] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [groupcullings, setGroupCullings] = useState([]);
+    const [filteredGroupCullingsForUser, setFilteredGroupCullingsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
-    useEffect(() => {
-        const fetchGroupCullings = async () => {
-            try {
-                const groupcullingsData = await getGroupCullings();
-                setGroupCullings(groupcullingsData);
-            } catch (error) {
-                console.error('Error fetching cullings:', error);
-            }
-        };
-        fetchGroupCullings();
-    }, [add, del, edit]);
+
+    // useEffect(() => {
+    //     const fetchGroupCullings = async () => {
+    //         try {
+    //             const groupcullingsData = await getGroupCullings();
+    //             setGroupCullings(groupcullingsData);
+    //         } catch (error) {
+    //             console.error('Error fetching cullings:', error);
+    //         }
+    //     };
+    //     fetchGroupCullings();
+    // }, [add, del, edit]);
+
+    // Fetch Group Cullings (similar to Bodyweights, Eggs, and Deaths)
+useEffect(() => {
+    const fetchGroupCullings = async () => {
+      try {
+        const groupcullingsData = await getGroupCullings();
+        setGroupCullings(groupcullingsData);
+      } catch (error) {
+        console.error('Error fetching cullings:', error);
+      }
+    };
+    fetchGroupCullings();
+  }, [add, del, edit]);
+  
+  // Filter Group Cullings based on User Role
+  useEffect(() => {
+    if (user.role === "USER") {
+      const filteredData = groupcullings.filter(item => item.collector === user.id);
+      setFilteredGroupCullingsForUser(filteredData);
+    } else {
+      setFilteredGroupCullingsForUser(groupcullings);
+    }
+  }, [groupcullings, user]);
 
 
     useEffect(() => {
@@ -190,15 +215,6 @@ const ViewGroupCulling = () => {
         }
     };
 
-    // const handleSubmit = async (e) => {
-    //     e.preventDefault();
-    //     try {
-    //         await addGroupCulling(formData);
-    //         setAdd(false);
-    //     } catch (error) {
-    //         console.error('Error adding culling:', error);
-    //     }
-    // };
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -239,7 +255,6 @@ const ViewGroupCulling = () => {
             }
         }
     };
-    
 
     const handleBack = () => {
         setAdd(false)
@@ -311,7 +326,7 @@ const ViewGroupCulling = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredcullings = groupcullings.filter((culling) =>
+    const filteredcullings = filteredGroupCullingsForUser.filter((culling) =>
         String(getGroupDetails(culling.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -400,7 +415,7 @@ const ViewGroupCulling = () => {
                     <ValidatorForm onSubmit={handleUpdateCulling} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <FormControl variant="outlined" fullWidth>
+                                {/* <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
                                         options={combinedData}
                                         getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
@@ -419,7 +434,30 @@ const ViewGroupCulling = () => {
                                             />
                                         )}
                                     />
-                                </FormControl>
+                                </FormControl> */}
+
+<FormControl variant="outlined" fullWidth>
+  <Autocomplete
+    options={combinedData}
+    getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
+    value={combinedData.find((group) => group.id === groupculling.chicken_group) || null} 
+    onChange={(event, value) => {
+      setGroupCulling({
+        ...groupculling,
+        chicken_group: value?.id || '', 
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Group"
+        variant="outlined"
+        required
+      />
+    )}
+  />
+</FormControl>
+
                                 <br />
                                 <br />
                                 <TextField

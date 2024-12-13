@@ -5,7 +5,7 @@ import Scrollbar from "react-perfect-scrollbar";
 import { VerticalNav } from "app/components";
 import useSettings from "app/hooks/useSettings";
 import { navigations } from "app/navigations";
-import AuthContext from "app/contexts/JWTAuthContext"; 
+import AuthContext from "app/contexts/JWTAuthContext";
 const StyledScrollBar = styled(Scrollbar)(() => ({
   paddingLeft: "1rem",
   paddingRight: "1rem",
@@ -25,14 +25,15 @@ const SideNavMobile = styled("div")(({ theme }) => ({
 
 export default function Sidenav({ children }) {
   const { settings, updateSettings } = useSettings();
-  const { user } = useContext(AuthContext); 
+  const { user } = useContext(AuthContext);
   const userRole = user?.role;
   const filteredNavigations = navigations.filter(item => {
     if (userRole === "USER") {
-      
-      return !["Dashboard", "Manage House | Breed", "Manage Users"].includes(item.name);
+
+      return !["Dashboard", "Manage House | Breed", "Manage Users", "Manage Chicken Distribution"].includes(item.name);
+
     }
-    return true; 
+    return true;
   });
 
   const updateSidebarMode = (sidebarSettings) => {

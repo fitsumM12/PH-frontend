@@ -185,6 +185,69 @@ export const getMonthlyIndividualVaccination = async () => {
     }
 };
 
+// FETCH INDIVIDUAL DEATH COUNT
+
+export const getMonthlyIndividualDeathCount = async () => {
+    try {
+        const response = await axios.get(`${CHICKEN_API_URL}fetch_individual_death_count/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        console.log("Death Count API Response: ", response.data); // Log the response
+
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching individual death count:', error);
+        throw error;
+    }
+};
+// export const getMonthlyIndividualDeathCount = async () => {
+//     try {
+//         const response = await axios.get(`${CHICKEN_API_URL}fetch_individual_death_count/`, {
+//             headers: {
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         });
+//         console.log("Death Count API Response: ", response.data);
+        
+//         // Return individual_death_count directly
+//         return response.data.individual_death_count || 0;
+//     } catch (error) {
+//         console.error("Error fetching individual death count:", error);
+//         throw error;
+//     }
+// };
+
+// FETCH MONTHLY CHICKEN DATA
+export const getMonthlyChickenData = async () => {
+    try {
+        const response = await axios.get(`${CHICKEN_API_URL}fetch_monthly_chicken_data_api/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching monthly chicken data:', error);
+        throw error;
+    }
+};
+
+// export const getMonthlyIndividualDeath = async () => {
+//     try {
+//         const response = await axios.get(`${CHICKEN_API_URL}fetch_death_count_per_individual_chicken_api/`, {
+//             headers: {
+//                 Authorization: `Bearer ${token}`,
+//             }
+//         });
+//         return response.data;
+//     } catch (error) {
+//         console.error('Error fetching breeds:', error);
+//         throw error;
+//     }
+// };
+
 
 
 export const getMonthlyIndividualCount = async () => {

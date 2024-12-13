@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
 
 // Base URL for your API
 const CHICKEN_API_URL = 'http://127.0.0.1:8000/api/poultry/';
@@ -421,6 +420,11 @@ export const updateGroupCullingInAPI = async (id, formData) => {
         throw error;
     }
 };
+
+
+
+
+
 
 
 

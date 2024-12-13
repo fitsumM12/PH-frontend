@@ -67,21 +67,44 @@ const ViewGroupVaccination = () => {
     const [groupVaccine, setGroupVaccine] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [groupVaccines, setGroupVaccines] = useState([]);
+    const [filteredGroupVaccinesForUser, setFilteredGroupVaccinesForUser] = useState([]);
+
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
+    // useEffect(() => {
+    //     const fetchGroupVaccines = async () => {
+    //         try {
+    //             const groupVaccinesData = await getGroupVaccinations();
+    //             setGroupVaccines(groupVaccinesData);
+    //         } catch (error) {
+    //             console.error('Error fetching Vaccine:', error);
+    //         }
+    //     };
+    //     fetchGroupVaccines();
+    // }, [add, del, edit]);
     useEffect(() => {
         const fetchGroupVaccines = async () => {
-            try {
-                const groupVaccinesData = await getGroupVaccinations();
-                setGroupVaccines(groupVaccinesData);
-            } catch (error) {
-                console.error('Error fetching Vaccine:', error);
-            }
+          try {
+            const groupVaccinesData = await getGroupVaccinations();
+            setGroupVaccines(groupVaccinesData);
+          } catch (error) {
+            console.error('Error fetching Vaccine:', error);
+          }
         };
         fetchGroupVaccines();
-    }, [add, del, edit]);
+      }, [add, del, edit]);
+      
+      // Filter Group Vaccines based on User Role
+      useEffect(() => {
+        if (user.role === "USER") {
+          const filteredData = groupVaccines.filter(item => item.collector === user.id);
+          setFilteredGroupVaccinesForUser(filteredData);
+        } else {
+          setFilteredGroupVaccinesForUser(groupVaccines);
+        }
+      }, [groupVaccines, user]);
 
 
     useEffect(() => {
@@ -268,7 +291,7 @@ const ViewGroupVaccination = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredVaccines = groupVaccines.filter((Vaccine) =>
+    const filteredVaccines = filteredGroupVaccinesForUser.filter((Vaccine) =>
         String(getGroupDetails(Vaccine.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 

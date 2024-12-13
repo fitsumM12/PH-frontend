@@ -118,6 +118,7 @@ const ViewChickenDistribution = () => {
         return breed ? `${breed.name}` : 'Unknown Breed';
     };
 
+
     const getRequesterDetails = (id) => {
         const requester = requesters.find((r) => r.id === id);
         return requester ? `${requester.requester_name}` : 'no Requester';
@@ -137,6 +138,7 @@ const ViewChickenDistribution = () => {
             console.log('Deletion cancelled');
         }
     };
+
 
     const handleChangePage = (_, newPage) => {
         setPage(newPage);
@@ -197,6 +199,8 @@ const ViewChickenDistribution = () => {
             console.error('Error updating chickendistribution:', error);
         }
     };
+
+
 
     const handleDownLoad = () => {
         const fetchChickenDistributions = async () => {
@@ -331,48 +335,68 @@ const ViewChickenDistribution = () => {
                                     errorMessages={["This field is required"]}
                                 />
 
+
+                                {/* <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="breed-label">Breed</InputLabel>
+                                    <Select
+                                        labelId="breed-label"
+                                        name="breed"
+                                        value={chickendistribution.breed}
+                                        onChange={handleChangeEdit}
+                                        label="Breed"
+                                        required
+                                    >
+                                        {breeds.map((breed) => (
+                                            <MenuItem key={breed.id} value={breed.id}>
+                                                {breed.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl> */}
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
                                         options={breeds}
-                                        getOptionLabel={(breed) => breed.name}
+                                        getOptionLabel={(option) => option.name}
+                                        value={breeds.find((breed) => breed.id === chickendistribution.breed) || null}
+                                        onChange={(event, value) => {
+                                            handleChangeEdit({
+                                                target: {
+                                                    name: 'breed',
+                                                    value: value?.id || '',
+                                                },
+                                            });
+                                        }}
                                         renderInput={(params) => (
                                             <TextField
                                                 {...params}
-                                                label="Breed"
+                                                label="Select Breed"
                                                 variant="outlined"
+                                                required
                                             />
                                         )}
-                                        value={breeds.find(breed => breed.id === chickendistribution.breed) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChangeEdit({ target: { name: 'breed', value: newValue ? newValue.id : '' } });
-                                        }}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
                                     />
                                 </FormControl>
 
+
                                 <br />
                                 <br />
-
-
-                                <FormControl variant="outlined" fullWidth>
-                                    <Autocomplete
-                                        options={requesters}
-                                        getOptionLabel={(requester) => requester.requester_name}
-                                        renderInput={(params) => (
-                                            <TextField
-                                                {...params}
-                                                label="Requester"
-                                                variant="outlined"
-                                            />
-                                        )}
-                                        value={requesters.find(requester => requester.id === chickendistribution.requester) || null}
-                                        onChange={(event, newValue) => {
-                                            handleChangeEdit({ target: { name: 'requester', value: newValue ? newValue.id : '' } });
-                                        }}
-                                        isOptionEqualToValue={(option, value) => option.id === value.id}
-                                    />
+                                <FormControl variant="outlined" fullWidth >
+                                    <InputLabel id="requester-label">Requester</InputLabel>
+                                    <Select
+                                        labelId="requester-label"
+                                        name="requester"
+                                        value={chickendistribution.requester}
+                                        onChange={handleChangeEdit}
+                                        label="requester"
+                                        required
+                                    >
+                                        {requesters.map((requester) => (
+                                            <MenuItem key={requester.id} value={requester.id}>
+                                                {requester.requester_name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
                                 </FormControl>
-
                                 <br />
                                 <br />
 
@@ -611,4 +635,3 @@ const ViewChickenDistribution = () => {
 }
 
 export default ViewChickenDistribution;
-// kwndkjwe

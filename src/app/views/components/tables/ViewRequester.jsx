@@ -14,19 +14,12 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import { FormControl } from "@mui/material";
-
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Span } from "app/components/Typography";
-import { getChickens, getIndividualDeaths } from "app/apis/individual_chicken_api";
-import {
-  addIntake,
-  getIntake,
-  deleteIntake,
-  updateIntakeInAPI,
-  getIntakes,
-} from "app/apis/individual_chicken_api";
+import { addRequester, getRequester,getRequesters, updateRequesterInAPI , deleteRequester} from "app/apis/requester_api";
+
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import { useContext } from "react";
 import AuthContext from "app/contexts/JWTAuthContext";
@@ -46,144 +39,65 @@ const StyledTable = styled(Table)(() => ({
   },
 }));
 
-const ViewIndividualIntake = () => {
+const ViewRequester = () => {
   const { user } = useContext(AuthContext);
   const initialFormData = {
-    id: 0,
-    bird: 0,
-    record_date: new Date().toISOString().split("T")[0],
-    feed_given: 0.0,
-    feed_refusal: 0.0,
-    collector: user.id,
-    remarks: 0,
+    requester_id: "",
+    requester_name: "",
+    requester_region: "",
+    requester_district:"",
+    requester_city:"",
+    requester_phone_number:"",
+    requester_male_count: 0.0,
+    requester_female_count: 0.0
   };
   const [add, setAdd] = useState(false);
   const [del, setDelete] = useState(true);
   const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [intake, setIntake] = useState(initialFormData);
-  const [chickens, setChickens] = useState([]);
-  const [intakes, setIntakes] = useState([]);
-  const [filteredintakesforuser, setFilteredintakesforuser] = useState([])
+  const [requesters, setRequesters] = useState([]);
+  const [requester, setRequester] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
-
-  const [houses, setHouses] = useState([]);
-  const [breeds, setBreeds] = useState([]);
-  const [individualchickens, setIndividualChickens] = useState([]);
-  const [aliveChickens, setAliveChickens] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const fetchChickensAndDeaths = async () => {
-      try {
-        const chickensData = await getChickens();
-        const deathsData = await getIndividualDeaths();
-
-        setChickens(chickensData);
-
-        const deadBirdIds = new Set(
-          deathsData
-            .filter((death) => death.condition.toLowerCase() === "dead")
-            .map((death) => death.bird)
-        );
-        const alive = chickensData.filter(
-          (chicken) => !deadBirdIds.has(chicken.id)
-        );
-        setAliveChickens(alive);
-      } catch (error) {
-        console.error("Error fetching chickens or death records:", error);
-      }
+    const fetchRequesters = async () => {
+        try {
+            const requestersData = await getRequesters();
+            setRequesters(requestersData);
+        } catch (error) {
+            console.error("Error fetching requesters:", error);
+        }
     };
 
-    fetchChickensAndDeaths();
-  }, []);
-
-  useEffect(() => {
-    const fetchIndividualChickens = async () => {
-      try {
-        const individualchickensData = await getChickens();
-        setIndividualChickens(individualchickensData);
-      } catch (error) {
-        console.error("Error fetching chickens:", error);
-      }
+    fetchRequesters();
+}, []);
+useEffect(() => {
+    const fetchRequesters = async () => {
+        try {
+            const requestersData = await getRequesters(); // Fetching data from getRequesters
+            setRequesters(requestersData); // Update state with the fetched data
+        } catch (error) {
+            console.error("Error fetching requesters:", error); // Error handling
+        }
     };
 
-    fetchIndividualChickens();
-  }, [add, edit]);
+    fetchRequesters();
+}, [add, del, edit]); // Dependencies that trigger re-fetching
 
-  useEffect(() => {
-    const fetchBreeds = async () => {
-      try {
-        const breedsData = await getBreeds();
-        setBreeds(breedsData);
-      } catch (error) {
-        console.error("Error fetching Breeds:", error);
-      }
-    };
-    const fetchHouses = async () => {
-      try {
-        const housesData = await getHouses();
-        setHouses(housesData);
-      } catch (error) {
-        console.error("Error fetching Houses:", error);
-      }
-    };
-    fetchBreeds();
-    fetchHouses();
-  }, [add, edit]);
-
-  const getBreedDetails = (id) => {
-    const breed = breeds.find((b) => b.id === id);
-    return breed ? `${breed.name}` : "Unknown Breed";
-  };
-
-  const getHouseDetails = (id) => {
-    const house = houses.find((h) => h.id === id);
-    return house
-      ? `${house.house_number}-${house.pen_number}`
-      : "Unknown House";
-  };
-
-  const getIndividualDetails = (id) => {
-    const individualchicken = individualchickens.find((h) => h.id === id);
-    return individualchicken ? `${individualchicken.bird_id}` : "Unknown House";
-  };
-  useEffect(() => {
-    const fetchIntakes = async () => {
-      try {
-        const bodyweightsData = await getIntakes();
-        setIntakes(bodyweightsData);
-      } catch (error) {
-        console.error("Error fetching chickens:", error);
-      }
-    };
-    fetchIntakes();
-  }, [add, del, edit]);
-
-  useEffect(() => {
-    const fetchChickens = async () => {
-      try {
-        const chickensData = await getChickens();
-        setChickens(chickensData);
-      } catch (error) {
-        console.error("Error fetching chickens:", error);
-      }
-    };
-
-    fetchChickens();
-  }, [add, edit]);
-
-  const handleDeleteIntake = async (id) => {
+  const handleDeleteRequester = async (id) => {
     const confirmed = window.confirm(
-      "Are you sure you want to delete this intake record?"
+      "Are you sure you want to delete this requester record?"
     );
 
     if (confirmed) {
       try {
-        await deleteIntake(id);
+        const response = await deleteRequester(id);  // Make sure this function works
+        console.log(response);  // Log the response for debugging
         setDelete((prev) => !prev);
       } catch (error) {
-        console.error("Failed to delete the intake record:", error);
+        console.error("Failed to delete the requester record:", error);
       }
     } else {
       console.log("Deletion cancelled");
@@ -203,23 +117,24 @@ const ViewIndividualIntake = () => {
     setAdd(true);
     setFormData(initialFormData);
   };
-  const updateIntake = async (id) => {
+  const updateRequester = async (id) => {
     setEdit(true);
     try {
-      const response = await getIntake(id);
-      setIntake(response);
+      const response = await getRequester(id);
+      setRequester(response);
     } catch (error) {
-      console.error("Error fetching intake:", error);
+      console.error("Error fetching requester:", error);
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await addIntake(formData);
+      await addRequester(formData);
       setAdd(false);
     } catch (error) {
-      console.error("Error adding intake:", error);
+      console.error("Error adding requester:", error);
     }
   };
 
@@ -234,33 +149,35 @@ const ViewIndividualIntake = () => {
     });
   };
   const handleChangeEdit = (event) => {
-    setIntake({
-      ...intake,
+    setRequester({
+      ...requester,
       [event.target.name]: event.target.value,
     });
   };
-  const handleUpdateIntake = async (e) => {
+
+
+  const handleUpdateRequester = async (e) => {
     e.preventDefault();
     try {
-      await updateIntakeInAPI(intake.id, intake);
+      await updateRequesterInAPI(requester.id, requester);
       setEdit(false);
       setAdd(false);
     } catch (error) {
-      console.error("Error updating intake:", error);
+      console.error("Error updating requester:", error);
     }
   };
 
   const handleDownLoad = () => {
-    const fetchIntakes = async () => {
+    const fetchRequesters = async () => {
       try {
-        const intakeData = await getIntakes();
-        const csvData = jsonToCsv(intakeData);
-        downloadCsv(csvData, "intakedata.csv");
+        const requesterData = await getRequesters();
+        const csvData = jsonToCsv(requesterData);
+        downloadCsv(csvData, "requesterdata.csv");
       } catch (error) {
         console.error("Error fetching bodyweight:", error);
       }
     };
-    fetchIntakes();
+    fetchRequesters();
   };
 
   function jsonToCsv(jsonData) {
@@ -285,50 +202,10 @@ const ViewIndividualIntake = () => {
     a.click();
     document.body.removeChild(a);
   }
-  
-  const [mergedData, setMergedData] = useState([]);
-  const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
-  
-  useEffect(() => {
-      const mergeData = async () => {
-          try {
-              if (individualchickens.length > 0 && intakes.length > 0) {
-                  const combinedVaccines = intakes.map((intake) => {
-                      const chicken = individualchickens.find(
-                          (ch) => ch.id === intake.bird
-                      );
-                      return {
-                          ...intake,
-                          bird_id: chicken ? chicken.bird_id : "Unknown",
-                          collector: intake.collector, // Assuming this exists
-                      };
-                  });
-                  setMergedData(combinedVaccines);
-              }
-          } catch (error) {
-              console.error("Error merging data:", error);
-          }
-      };
-      mergeData();
-  }, [intakes, individualchickens]);
-  
-  // Filter Merged Data based on User Role
-  useEffect(() => {
-      if (user.role === "USER") {
-          const filteredData = mergedData.filter((item) => item.collector === user.id);
-          setFilteredMergedDataForUser(filteredData);
-      } else {
-          setFilteredMergedDataForUser(mergedData);
-      }
-  }, [mergedData, user]);
-  
 
-
-
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const filteredintakes = filteredMergedDataForUser.filter((vaccine) =>
-    String(vaccine.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
+  
+  const filteredrequesters = requesters.filter((requester) =>
+      String(requester.requester_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -341,18 +218,18 @@ const ViewIndividualIntake = () => {
                 <TableCell align="center">
                   <ValidatorForm>
                     <TextValidator
-                      label="Chicken ID"
+                      label="Requester ID"
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      name="bird"
+                      // name="bird_id"
                       value={searchQuery}
                       validators={["required"]}
                       errorMessages={["this field is required"]}
                     />
                   </ValidatorForm>
                 </TableCell>
-                <TableCell align="center">Feed Given</TableCell>
-                <TableCell align="center">Feed Refusal</TableCell>
-                <TableCell align="center">Record Date</TableCell>
+                <TableCell align="center">Name</TableCell>
+                <TableCell align="center">Region</TableCell>
+                <TableCell align="center">City</TableCell>
                 <TableCell align="right">
                   Action | <Button onClick={addNew}>Add New</Button>
                 </TableCell>
@@ -364,21 +241,21 @@ const ViewIndividualIntake = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredintakes
+              {filteredrequesters
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((intake, index) => (
+                .map((requester, index) => (
                   <TableRow key={index}>
                     <TableCell align="center">
-                      {getIndividualDetails(intake.bird)}
+                    {requester.requester_id}
                     </TableCell>
-                    <TableCell align="center">{intake.feed_given}</TableCell>
-                    <TableCell align="center">{intake.feed_refusal}</TableCell>
-                    <TableCell align="center">{intake.record_date}</TableCell>
+                    <TableCell align="center">{requester.requester_name}</TableCell>
+                    <TableCell align="center">{requester.requester_region}</TableCell>
+                    <TableCell align="center">{requester.requester_city}</TableCell>
                     <TableCell align="right">
                       <Tooltip title="Edit">
                         <IconButton
                           onClick={() => {
-                            updateIntake(intake.id);
+                            updateRequester(requester.id);
                           }}
                           sx={{ "&:hover": { bgcolor: "grey.200" } }}
                         >
@@ -388,7 +265,7 @@ const ViewIndividualIntake = () => {
                       {user.role !== "USER" ? (
                         <Tooltip title="Delete">
                           <IconButton
-                            onClick={() => handleDeleteIntake(intake.id)}
+                            onClick={() => handleDeleteRequester(requester.id)}
                             sx={{ "&:hover": { bgcolor: "grey.200" } }}
                           >
                             <DeleteIcon sx={{ color: "red" }} />
@@ -408,7 +285,7 @@ const ViewIndividualIntake = () => {
             page={page}
             component="div"
             rowsPerPage={rowsPerPage}
-            count={filteredintakes.length}
+            count={filteredrequesters.length}
             onPageChange={handleChangePage}
             rowsPerPageOptions={[5, 10, 25]}
             onRowsPerPageChange={handleChangeRowsPerPage}
@@ -416,77 +293,89 @@ const ViewIndividualIntake = () => {
             backIconButtonProps={{ "aria-label": "Previous Page" }}
           />
         </>
-      ) : edit === true && add === false ? (
-        <ValidatorForm onSubmit={handleUpdateIntake} onError={() => null}>
+      )  : edit === true && add === false ? (
+        <ValidatorForm onSubmit={handleUpdateRequester} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
               <TextField
-                type="number"
-                name="bird_id"
-                label="Chicken ID"
+                label="Requester ID"
                 onChange={handleChangeEdit}
-                value={intake.bird}
+                name="requester_id"
+                value={requester.requester_id}
                 validators={["required"]}
-                InputProps={{
-                  readOnly: true,
-                }}
                 errorMessages={["This field is required"]}
               />
               <TextField
-                type="Date"
-                name="record_date"
-                label="Record Date"
+                label="Requester Name"
                 onChange={handleChangeEdit}
-                value={intake.record_date}
+                name="requester_name"
+                value={requester.requester_name}
                 validators={["required"]}
-                InputProps={{
-                  readOnly: true,
-                }}
                 errorMessages={["This field is required"]}
               />
 
               <TextField
-                type="number"
-                name="collector"
-                label="Data Collector"
+                label="Region"
                 onChange={handleChangeEdit}
-                value={intake.collector}
-                InputProps={{
-                  readOnly: true,
-                }}
+                name="requester_region"
+                value={requester.requester_region}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                fullWidth
               />
+              <TextField
+                label="City"
+                onChange={handleChangeEdit}
+                name="requester_city"
+                value={requester.requester_city}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+              />
+
             </Grid>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <TextField
-                type="text"
-                name="feed_given"
-                label="Feed Given"
+
+            <TextField
+                label="District"
                 onChange={handleChangeEdit}
-                value={intake.feed_given}
+                name="requester_district"
+                value={requester.requester_district}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
-              />
-              <TextField
-                type="text"
-                name="feed_refusal"
-                label="Feed Refusal"
-                onChange={handleChangeEdit}
-                value={intake.feed_refusal}
-                validators={["required"]}
-                errorMessages={["This field is required"]}
+                fullWidth
               />
 
-              <TextField
-                type="text"
-                name="remarks"
-                label="Remarks"
+            <TextField
+                label="Phone Number"
                 onChange={handleChangeEdit}
-                value={intake.remarks}
+                name="requester_phone_number"
+                value={requester.requester_phone_number}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
+                fullWidth
               />
+              <TextField
+                label="Male Count"
+                onChange={handleChangeEdit}
+                name="requester_male_count"
+                value={requester.requester_male_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+                type="number"
+              />
+                <TextField
+                label="Female Count"
+                onChange={handleChangeEdit}
+                name="requester_female_count"
+                value={requester.requester_female_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                fullWidth
+                type="number"
+              />
+ 
             </Grid>
           </Grid>
           <Tooltip title="Back">
@@ -515,88 +404,88 @@ const ViewIndividualIntake = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <FormControl variant="outlined" fullWidth>
-                <Autocomplete
-                  options={aliveChickens}
-                  getOptionLabel={(option) =>
-                    `Chicken ID: ${option.bird_id}, Hatch: ${option.hatch} Sire: ${option.sire_id}, Dam: ${option.dam_id}`
-                  }
-                  onChange={(event, value) => {
-                    setFormData({
-                      ...formData,
-                      bird: value?.id || "",
-                    });
-                  }}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Select Chicken"
-                      variant="outlined"
-                      required
-                    />
-                  )}
-                />
-              </FormControl>
-              <br />
-              <br />
-
               <TextField
-                type="Date"
-                name="record_date"
-                label="Record Date"
+                type="text"
+                name="requester_id"
+                label="Requester id:"
                 onChange={handleChange}
-                value={formData.record_date}
-                validators={["required"]}
-                InputProps={{
-                  readOnly: true,
-                }}
-                errorMessages={["This field is required"]}
-              />
-
-              <TextField
-                type="number"
-                name="collector"
-                label="Data Collector"
-                onChange={handleChange}
-                value={intake.collector}
-                InputProps={{
-                  readOnly: true,
-                }}
+                value={formData.requester_id}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
-              />
-            </Grid>
-            <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <TextField
-                type="number"
-                name="feed_given"
-                label="Feed Given"
-                onChange={handleChange}
-                value={formData.feed_given}
-                validators={["required"]}
-                errorMessages={["This field is required"]}
-                step="0.01"
-              />
-              <TextField
-                type="number"
-                name="feed_refusal"
-                label="Feed Refusal"
-                onChange={handleChange}
-                value={formData.feed_refusal}
-                validators={["required"]}
-                errorMessages={["This field is required"]}
-                step="0.01"
               />
 
               <TextField
                 type="text"
-                name="remarks"
-                label="Remarks"
+                name="requester_name"
+                label="Requester name:"
                 onChange={handleChange}
-                value={formData.remarks}
+                value={formData.requester_name}
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
+
+              <TextField
+                type="text"
+                name="requester_region"
+                label="Requester region:"
+                onChange={handleChange}
+                value={formData.requester_region}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+              />
+                <TextField
+                type="text"
+                name="requester_district"
+                label="Requester district"
+                onChange={handleChange}
+                value={formData.requester_district}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+            </Grid>
+            <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
+              <TextField
+                type="text"
+                name="requester_city"
+                label="Requester city"
+                onChange={handleChange}
+                value={formData.requester_city}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+                <TextField
+                type="number"
+                name="requester_phone_number"
+                label="Requester phone number"
+                onChange={handleChange}
+                value={formData.requester_phone_number}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+                <TextField
+                type="number"
+                name="requester_male_count"
+                label="Requester male count"
+                onChange={handleChange}
+                value={formData.requester_male_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+              <TextField
+                type="number"
+                name="requester_female_count"
+                label="Requester female count"
+                onChange={handleChange}
+                value={formData.requester_female_count}
+                validators={["required"]}
+                errorMessages={["This field is required"]}
+                step="0.01"
+              />
+
             </Grid>
           </Grid>
           <Tooltip title="Back">
@@ -627,5 +516,4 @@ const ViewIndividualIntake = () => {
     </>
   );
 };
-
-export default ViewIndividualIntake;
+export default ViewRequester;

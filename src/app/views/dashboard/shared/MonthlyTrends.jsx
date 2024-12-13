@@ -23,11 +23,16 @@ import {
   getMonthlyIndividualEgg,
   getMonthlyIndividualFeedIntakeRefusal,
   getMonthlyIndividualBodyweight,
+  getMonthlyIndividualVaccination,
   getMonthlyGroupDeath,
   getMonthlyGroupCulling,
   getMonthlyGroupReplacement,
   getMonthlyGroupVaccination,
+  getMonthlyIndividualDeathCount, 
+
+  
 } from "app/apis/kpi_api";
+
 
 const MONTHS = [
   "Jan",
@@ -56,12 +61,14 @@ const MonthlyTrends = () => {
     individualEggs: [],
     individualFeedIntakes: { feed_intake: [], feed_refusal: [] },
     individualBodyweights: [],
+    individualVaccinations: [],
+    
+
   });
   const [selectedYear, setSelectedYear] = useState(dayjs().year());
   const [selectedYearForGroup, setSelectedYearForGroup] = useState(
     dayjs().year()
   );
-
   const fetchData = async () => {
     try {
       const [
@@ -75,8 +82,9 @@ const MonthlyTrends = () => {
         individualEggs,
         individualFeedIntakes,
         individualBodyweights,
-        individualDeaths,
         individualVaccinations,
+        individualDeathCounts, // Add this
+
       ] = await Promise.all([
         getMonthlyGroupEgg(),
         getMonthlyGroupFeedIntakeRefusal(),
@@ -88,42 +96,34 @@ const MonthlyTrends = () => {
         getMonthlyIndividualEgg(),
         getMonthlyIndividualFeedIntakeRefusal(),
         getMonthlyIndividualBodyweight(),
+        getMonthlyIndividualVaccination(),
+        getMonthlyIndividualDeathCount(), // Add this
+
       ]);
+      console.log("Individual Death Counts: ", individualDeathCounts);
 
       setRecords({
         groupEggs: Array.isArray(groupEggs) ? groupEggs : [],
         groupFeedIntakes: {
-          feed_intake: Array.isArray(groupFeedIntakes.feed_intake)
-            ? groupFeedIntakes.feed_intake
-            : [],
-          feed_refusal: Array.isArray(groupFeedIntakes.feed_refusal)
-            ? groupFeedIntakes.feed_refusal
-            : [],
+          feed_intake: Array.isArray(groupFeedIntakes.feed_intake) ? groupFeedIntakes.feed_intake : [],
+          feed_refusal: Array.isArray(groupFeedIntakes.feed_refusal) ? groupFeedIntakes.feed_refusal : [],
         },
-        groupBodyweights: Array.isArray(groupBodyweights)
-          ? groupBodyweights
-          : [],
+        groupBodyweights: Array.isArray(groupBodyweights) ? groupBodyweights : [],
         groupDeaths: Array.isArray(groupDeaths) ? groupDeaths : [],
         groupCullings: Array.isArray(groupCullings) ? groupCullings : [],
-        groupReplacements: Array.isArray(groupReplacements)
-          ? groupReplacements
-          : [],
-        groupVaccinations: Array.isArray(groupVaccinations)
-          ? groupVaccinations
-          : [],
+        groupReplacements: Array.isArray(groupReplacements) ? groupReplacements : [],
+        groupVaccinations: Array.isArray(groupVaccinations) ? groupVaccinations : [],
         individualEggs: Array.isArray(individualEggs) ? individualEggs : [],
+        individualVaccinations: Array.isArray(individualVaccinations) ? individualVaccinations : [],
+        individualDeathCounts: Array.isArray(individualDeathCounts) ? individualDeathCounts : [],
         individualFeedIntakes: {
-          feed_intake: Array.isArray(individualFeedIntakes.feed_intake)
-            ? individualFeedIntakes.feed_intake
-            : [],
-          feed_refusal: Array.isArray(individualFeedIntakes.feed_refusal)
-            ? individualFeedIntakes.feed_refusal
-            : [],
+          feed_intake: Array.isArray(individualFeedIntakes.feed_intake) ? individualFeedIntakes.feed_intake : [],
+          feed_refusal: Array.isArray(individualFeedIntakes.feed_refusal) ? individualFeedIntakes.feed_refusal : [],
         },
-        individualBodyweights: Array.isArray(individualBodyweights)
-          ? individualBodyweights
-          : [],
+        individualBodyweights: Array.isArray(individualBodyweights) ? individualBodyweights : [],
+        
       });
+
     } catch (error) {
       console.error("Error fetching data: ", error);
     }
@@ -132,7 +132,6 @@ const MonthlyTrends = () => {
   useEffect(() => {
     fetchData();
   }, []);
-  console.log("records", records);
   const handleYearChange = (newYear) => {
     setSelectedYear(newYear.year());
   };
@@ -140,10 +139,9 @@ const MonthlyTrends = () => {
   const handleYearChangeForGroup = (newYear) => {
     setSelectedYearForGroup(newYear.year());
   };
-
   const processIndividualChartData = useMemo(() => {
     const individualData = {};
-
+  
     const accumulateRecords = (records, key) => {
       if (!Array.isArray(records)) {
         console.error(`Expected an array for ${key}, but got:`, records);
@@ -151,48 +149,53 @@ const MonthlyTrends = () => {
       }
 
       records.forEach((record) => {
+        console.log("Processing Record:", record);
         const year = record.year;
         const month = record.month;
-
+  
         if (year === selectedYear) {
           const monthStr = MONTHS[month - 1];
-
+  
           if (!individualData[monthStr]) {
             individualData[monthStr] = {
               month: monthStr,
               total_egg_production: 0,
+              vaccination_count: 0,
+              death_count: 0, // Add this
               total_feed_intake: 0,
               average_body_weight: 0,
               record_count: 0,
             };
           }
-          individualData[monthStr].total_egg_production +=
-            record.total_egg_production || 0;
-          individualData[monthStr].total_feed_intake +=
-            record.total_feed_intake || 0;
-          individualData[monthStr].average_body_weight +=
-            record.average_body_weight || 0;
+  
+          individualData[monthStr].total_egg_production += record.total_egg_production || 0;
+          individualData[monthStr].vaccination_count += record.total_vaccinations || 0; // Updated line
+          individualData[monthStr].total_feed_intake += record.total_feed_intake || 0;
+          individualData[monthStr].death_count += record.total_deaths || 0; // Add this
+          individualData[monthStr].average_body_weight += record.average_body_weight || 0;
           individualData[monthStr].record_count += 1;
         }
       });
     };
-
+  
     accumulateRecords(records.individualEggs, "individualEggs");
-    accumulateRecords(
-      records.individualFeedIntakes.feed_intake,
-      "individualFeedIntakes"
-    );
+    accumulateRecords(records.individualVaccinations, "individualVaccinations");
+    accumulateRecords(records.individualFeedIntakes.feed_intake, "individualFeedIntakes");
+    accumulateRecords(records.individualDeathCounts, "individualDeathCounts"); // Add this
+
     accumulateRecords(records.individualBodyweights, "individualBodyweights");
+  
     for (const month in individualData) {
       if (individualData[month].record_count > 0) {
-        individualData[month].average_body_weight /=
-          individualData[month].record_count;
+        individualData[month].average_body_weight /= individualData[month].record_count;
       }
     }
-
+  
     return MONTHS.map((month) => ({
       month,
       total_egg_production: individualData[month]?.total_egg_production || 0,
+      vaccination_count: individualData[month]?.vaccination_count || 0,
+      death_count: individualData[month]?.death_count || 0, // Add this
       total_feed_intake: individualData[month]?.total_feed_intake || 0,
       average_body_weight: individualData[month]?.average_body_weight || 0,
       record_count: individualData[month]?.record_count || 0,
@@ -317,12 +320,26 @@ const MonthlyTrends = () => {
             stroke="#8884d8"
             activeDot={{ r: 8 }}
           />
+          <Line
+            type="monotone"
+            dataKey="vaccination_count"
+            stroke="#8884d8"
+            activeDot={{ r: 8 }}
+          />
+   
           <Line type="monotone" dataKey="total_feed_intake" stroke="#82ca9d" />
           <Line
             type="monotone"
             dataKey="average_body_weight"
             stroke="#ff7300"
           />
+          <Line
+    type="monotone"
+    dataKey="death_count"
+    stroke="#ff0000"
+    activeDot={{ r: 8 }}
+/>
+
         </LineChart>
       </ResponsiveContainer>
       <hr />
@@ -353,6 +370,7 @@ const MonthlyTrends = () => {
           </Box>
         </Grid>
       </Grid>
+
       <ResponsiveContainer width="100%" height={200}>
         <LineChart data={processGroupChartData}>
           <CartesianGrid strokeDasharray="3 3" />

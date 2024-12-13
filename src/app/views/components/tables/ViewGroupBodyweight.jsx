@@ -46,6 +46,7 @@ const StyledTable = styled(Table)(() => ({
 const ViewGroupBodyweight = () => {
 
     const { user } = useContext(AuthContext);
+
     const initialFormData = {
         id: 0,
         chicken_group: 0,
@@ -69,7 +70,9 @@ const ViewGroupBodyweight = () => {
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
+    const [filteredgroupbodyweightsforuser, setFilteredgroupbodyweightsforuser] = useState([])
     const [breeds, setBreeds] = useState([]);
+
     useEffect(() => {
         const fetchGroupBodyweights = async () => {
             try {
@@ -81,6 +84,22 @@ const ViewGroupBodyweight = () => {
         };
         fetchGroupBodyweights();
     }, [add, del, edit]);
+
+    useEffect(() => {
+        if (user.role === "USER") {
+            const filteredData = groupbodyweights.filter(item => item.collector === user.id);
+            setFilteredgroupbodyweightsforuser(filteredData);
+        } else {
+            setFilteredgroupbodyweightsforuser(groupbodyweights);
+        }
+    }, [groupbodyweights, user]);
+
+
+
+
+    console.log("group bodyweight: ", groupbodyweights)
+    console.log("user", user)
+    console.log("group bodyweight: filtered", filteredgroupbodyweightsforuser)
 
 
     useEffect(() => {
@@ -277,7 +296,7 @@ const ViewGroupBodyweight = () => {
         document.body.removeChild(a);
     }
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredgroupbodyweights = groupbodyweights.filter((bodyweight) =>
+    const filteredgroupbodyweights = filteredgroupbodyweightsforuser.filter((bodyweight) =>
         String(getGroupDetails(bodyweight.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -365,10 +384,11 @@ const ViewGroupBodyweight = () => {
                                     <Autocomplete
                                         options={combinedData}
                                         getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
+                                        value={combinedData.find((group) => group.id === groupbodyweight.chicken_group) || null}
                                         onChange={(event, value) => {
                                             setGroupBodyweight({
                                                 ...groupbodyweight,
-                                                chicken_group: value?.id || ''
+                                                chicken_group: value?.id || '',
                                             });
                                         }}
                                         renderInput={(params) => (
@@ -381,6 +401,7 @@ const ViewGroupBodyweight = () => {
                                         )}
                                     />
                                 </FormControl>
+
                                 <br />
                                 <br />
                                 <TextField

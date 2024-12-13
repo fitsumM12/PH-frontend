@@ -293,24 +293,46 @@ const ViewIndividualEgg = () => {
     document.body.removeChild(a);
   }
 
-  const [mergedData, setmergedData] = useState([]);
+  const [mergedData, setMergedData] = useState([]);
+  const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
+  
   useEffect(() => {
-    if (individualchickens.length > 0 && eggs.length > 0) {
-      const combinedVaccines = eggs.map((egg) => {
-        const chicken = individualchickens.find((ch) => ch.id === egg.bird);
-        return {
-          ...egg,
-          bird_id: chicken ? chicken.bird_id : "Unknown",
-        };
-      });
-      setmergedData(combinedVaccines);
-    }
+      const mergeData = async () => {
+          try {
+              if (individualchickens.length > 0 && eggs.length > 0) {
+                  const combinedEggs = eggs.map((egg) => {
+                      const chicken = individualchickens.find(
+                          (ch) => ch.id === egg.bird
+                      );
+                      return {
+                          ...egg,
+                          bird_id: chicken ? chicken.bird_id : "Unknown",
+                          collector: egg.collector, // Assuming this exists
+                      };
+                  });
+                  setMergedData(combinedEggs);
+              }
+          } catch (error) {
+              console.error("Error merging data:", error);
+          }
+      };
+      mergeData();
   }, [eggs, individualchickens]);
+  
+  // Filter Merged Data based on User Role
+  useEffect(() => {
+      if (user.role === "USER") {
+          const filteredData = mergedData.filter((item) => item.collector === user.id);
+          setFilteredMergedDataForUser(filteredData);
+      } else {
+          setFilteredMergedDataForUser(mergedData);
+      }
+  }, [mergedData, user]);
+  
   const [searchQuery, setSearchQuery] = useState("");
-  const filteredeggs = mergedData.filter((vaccine) =>
+  const filteredeggs = filteredMergedDataForUser.filter((vaccine) =>
     String(vaccine.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
-
   return (
     <>
       {add === false && edit === false ? (

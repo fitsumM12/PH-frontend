@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
 import { FormControl, InputLabel } from "@mui/material";
-
+import Autocomplete from '@mui/material/Autocomplete';
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
@@ -68,23 +68,35 @@ const ViewHactheryRecord = () => {
   const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [hatcheryRecords, setHatcheryRecords] = useState([]);
   const [hatcheryRecord, setHatcheryRecord] = useState([]);
+  const [hatcheryRecords, setHatcheryRecords] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
   const [breeds, setBreeds] = useState([]);
 
+  // const [hatcheryRecords, setHatcheryRecords] = useState([]);
+  const [filteredHatcheryRecordsForUser, setFilteredHatcheryRecordsForUser] = useState([]);
+  
   useEffect(() => {
     const fetchHatcheryRecords = async () => {
       try {
-        const hacheryData = await getHatcherRecords();
-        setHatcheryRecords(hacheryData);
+        const hatcheryData = await getHatcherRecords();
+        setHatcheryRecords(hatcheryData);
       } catch (error) {
-        console.error("Error fetching fetchHatcheryRecords:", error);
+        console.error("Error fetching hatcheryRecords:", error);
       }
     };
     fetchHatcheryRecords();
   }, [add, del, edit]);
-
+  
+  useEffect(() => {
+    if (user.role === 'USER') {
+      const filteredData = hatcheryRecords.filter(item => item.collector === user.id);
+      setFilteredHatcheryRecordsForUser(filteredData);
+    } else {
+      setFilteredHatcheryRecordsForUser(hatcheryRecords);
+    }
+  }, [hatcheryRecords, user]);
+  
   const handleDeleteHatcheryRecords = async (id) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this hatchery records?"
@@ -215,7 +227,7 @@ const ViewHactheryRecord = () => {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
-  const filterrecords = hatcheryRecords.filter((record) =>
+  const filterrecords = filteredHatcheryRecordsForUser.filter((record) =>
     String(record.id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -334,7 +346,7 @@ const ViewHactheryRecord = () => {
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
-              <FormControl variant="outlined" fullWidth>
+              {/* <FormControl variant="outlined" fullWidth>
                 <InputLabel id="breed-label">Breed</InputLabel>
                 <Select
                   labelId="breed-label"
@@ -350,7 +362,33 @@ const ViewHactheryRecord = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
+<FormControl variant="outlined" fullWidth>
+  <Autocomplete
+    options={breeds}
+    getOptionLabel={(option) => option.name}
+    value={breeds.find((breed) => breed.id === hatcheryRecord.breed_of_chicken) || null}
+    onChange={(event, value) => {
+      handleChangeEdit({
+        target: {
+          name: 'breed_of_chicken',
+          value: value?.id || '',
+        },
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Breed"
+        variant="outlined"
+        required
+      />
+    )}
+  />
+</FormControl>
+
+
+
               <br />
               <br />
               <TextField
@@ -431,7 +469,7 @@ const ViewHactheryRecord = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={6}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <FormControl variant="outlined" fullWidth>
+              {/* <FormControl variant="outlined" fullWidth>
                 <InputLabel id="breed-label">Breed</InputLabel>
                 <Select
                   labelId="breed-label"
@@ -447,7 +485,30 @@ const ViewHactheryRecord = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
+
+<FormControl variant="outlined" fullWidth>
+  <Autocomplete
+    options={breeds}  // Array of breeds
+    getOptionLabel={(option) => `ID : ${option.id} Name: ${option.name}`}  // Display breed name
+    onChange={(event, value) => {
+      setFormData({
+        ...formData,
+        breed_of_chicken: value?.id || "",  // Update the breed_of_chicken with selected breed's ID
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Breed"
+        variant="outlined"
+        required
+      />
+    )}
+  />
+</FormControl>
+
+              
               <br />
               <br />
               <TextField

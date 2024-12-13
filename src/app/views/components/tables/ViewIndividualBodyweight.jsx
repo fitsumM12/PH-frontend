@@ -279,22 +279,42 @@ const ViewIndividualBodyweight = () => {
     document.body.removeChild(a);
   }
 
-  const [mergedData, setmergedData] = useState([]);
-  useEffect(() => {
-    if (individualchickens.length > 0 && bodyweights.length > 0) {
-      const combined = bodyweights.map((bodyweight) => {
-        const chicken = individualchickens.find(
-          (ch) => ch.id === bodyweight.bird
-        );
-        return {
-          ...bodyweight,
-          bird_id: chicken ? chicken.bird_id : "Unknown",
-        };
-      });
-      setmergedData(combined);
+  const [mergedData, setMergedData] = useState([]);
+  const [filteredMergedDataForUser, setFilteredMergedDataForUser] = useState([]);
+
+useEffect(() => {
+    const mergeData = async () => {
+        try {
+            if (individualchickens.length > 0 && bodyweights.length > 0) {
+                const combined = bodyweights.map((bodyweight) => {
+                    const chicken = individualchickens.find(
+                        (ch) => ch.id === bodyweight.bird
+                    );
+                    return {
+                        ...bodyweight,
+                        bird_id: chicken ? chicken.bird_id : "Unknown",
+                        collector: bodyweight.collector, // Assuming this exists
+                    };
+                });
+                setMergedData(combined);
+            }
+        } catch (error) {
+            console.error("Error merging data:", error);
+        }
+    };
+    mergeData();
+}, [bodyweights, individualchickens]);
+
+// Filter Merged Data based on User Role
+useEffect(() => {
+    if (user.role === "USER") {
+        const filteredData = mergedData.filter((item) => item.collector === user.id);
+        setFilteredMergedDataForUser(filteredData);
+    } else {
+        setFilteredMergedDataForUser(mergedData);
     }
-  }, [bodyweights, individualchickens]);
-  const filteredBodyweights = mergedData.filter((bodyweight) =>
+}, [mergedData, user]);
+  const filteredBodyweights = filteredMergedDataForUser.filter((bodyweight) =>
     String(bodyweight.bird_id).toLowerCase().includes(searchQuery.toLowerCase())
   );
   return (

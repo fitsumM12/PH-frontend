@@ -64,22 +64,48 @@ const ViewGroupIntake = () => {
     const [groupintake, setGroupIntake] = useState(initialFormData);
     const [houses, setHouses] = useState([]);
     const [breeds, setBreeds] = useState([]);
-    const [groupintakes, setGroupIntakes] = useState([]);
+    const [groupIntakes, setGroupIntakes] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
+    // useEffect(() => {
+    //     const fetchGroupIntakes = async () => {
+    //         try {
+    //             const groupintakesData = await getGroupIntakes();
+    //             setGroupIntakes(groupintakesData);
+    //         } catch (error) {
+    //             console.error('Error fetching chickens:', error);
+    //         }
+    //     };
+    //     fetchGroupIntakes();
+    // }, [add, del, edit]);
+
+    // const [groupIntakes, setGroupIntakes] = useState([]);
+    const [filteredGroupIntakesForUser, setFilteredGroupIntakesForUser] = useState([]);
+
     useEffect(() => {
         const fetchGroupIntakes = async () => {
             try {
-                const groupintakesData = await getGroupIntakes();
-                setGroupIntakes(groupintakesData);
+                const groupIntakesData = await getGroupIntakes();
+                setGroupIntakes(groupIntakesData);
             } catch (error) {
-                console.error('Error fetching chickens:', error);
+                console.error("Error fetching group intakes:", error);
             }
         };
         fetchGroupIntakes();
     }, [add, del, edit]);
+
+    // Filter Group Intakes based on User Role
+    useEffect(() => {
+        if (user.role === "USER") {
+            const filteredData = groupIntakes.filter((item) => item.collector === user.id);
+            setFilteredGroupIntakesForUser(filteredData);
+        } else {
+            setFilteredGroupIntakesForUser(groupIntakes);
+        }
+    }, [groupIntakes, user]);
+
 
 
     useEffect(() => {
@@ -265,7 +291,7 @@ const ViewGroupIntake = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredgroupintake = groupintakes.filter((intake) =>
+    const filteredgroupintake = filteredGroupIntakesForUser.filter((intake) =>
         String(getGroupDetails(intake.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -354,7 +380,7 @@ const ViewGroupIntake = () => {
                     <ValidatorForm onSubmit={handleUpdateBodyweigtht} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <FormControl variant="outlined" fullWidth>
+                                {/* <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
                                         options={combinedData}
                                         getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
@@ -371,9 +397,34 @@ const ViewGroupIntake = () => {
                                                 variant="outlined"
                                                 required
                                             />
+
+                                        )}
+                                    />
+                                </FormControl> */}
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={combinedData}
+                                        getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
+                                        value={combinedData.find((group) => group.id === groupintake.chicken_group) || null}
+                                        onChange={(event, value) => {
+                                            setGroupIntake({
+                                                ...groupintake,
+                                                chicken_group: value?.id || '',
+                                            });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Group"
+                                                variant="outlined"
+                                                required
+                                            />
                                         )}
                                     />
                                 </FormControl>
+
+
                                 <br />
                                 <br />
                                 <TextField

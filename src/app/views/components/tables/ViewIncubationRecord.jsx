@@ -17,6 +17,7 @@ import {
 import { FormControl, InputLabel } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import Autocomplete from '@mui/material/Autocomplete';
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Span } from "app/components/Typography";
 import { getBreeds } from "app/apis/chicken_api";
@@ -69,23 +70,45 @@ const ViewIncubationRecord = () => {
   const [edit, setEdit] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-  const [incubationRecords, setIncubationRecords] = useState([]);
   const [incubationRecord, setIncubationRecord] = useState([]);
+  const [incubationRecords, setIncubationRecords] = useState([]);
+  const [filteredIncubationRecordsForUser, setFilteredIncubationRecordsForUser] = useState([]);
   const [formData, setFormData] = useState(initialFormData);
   const [breeds, setBreeds] = useState([]);
   const [hatcheryRecords, setHatcheryRecords] = useState([]);
 
+  // useEffect(() => {
+  //   const fetchIncubationRecords = async () => {
+  //     try {
+  //       const hacheryData = await getIncubationRecords();
+  //       setIncubationRecords(hacheryData);
+  //     } catch (error) {
+  //       console.error("Error fetching fetchIncubationRecords:", error);
+  //     }
+  //   };
+  //   fetchIncubationRecords();
+  // }, [add, del, edit]);
   useEffect(() => {
     const fetchIncubationRecords = async () => {
       try {
-        const hacheryData = await getIncubationRecords();
-        setIncubationRecords(hacheryData);
+        const hatcheryData = await getIncubationRecords();
+        setIncubationRecords(hatcheryData);
       } catch (error) {
         console.error("Error fetching fetchIncubationRecords:", error);
       }
     };
     fetchIncubationRecords();
   }, [add, del, edit]);
+  
+  // Filter Incubation Records based on User Role
+  useEffect(() => {
+    if (user.role === "USER") {
+      const filteredData = incubationRecords.filter(item => item.collector === user.id);
+      setFilteredIncubationRecordsForUser(filteredData);
+    } else {
+      setFilteredIncubationRecordsForUser(incubationRecords);
+    }
+  }, [incubationRecords, user]);
 
   useEffect(() => {
     const fetchHatcheryRecords = async () => {
@@ -226,7 +249,7 @@ const ViewIncubationRecord = () => {
   };
 
   const [searchQuery, setSearchQuery] = useState("");
-  const filterrecords = incubationRecords.filter((record) =>
+  const filterrecords = filteredIncubationRecordsForUser.filter((record) =>
     String(record.id).toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -358,7 +381,7 @@ const ViewIncubationRecord = () => {
                 validators={["required"]}
                 errorMessages={["This field is required"]}
               />
-              <FormControl variant="outlined" fullWidth>
+              {/* <FormControl variant="outlined" fullWidth>
                 <InputLabel id="breed-label">Hatchery Record</InputLabel>
                 <Select
                   labelId="breed-label"
@@ -378,7 +401,35 @@ const ViewIncubationRecord = () => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
+              </FormControl> */}
+              <FormControl variant="outlined" fullWidth>
+  <Autocomplete
+    options={hatcheryRecords}
+    getOptionLabel={(option) =>
+      `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${option.date_of_transfer}`
+    }
+    value={
+      hatcheryRecords.find((hatch) => hatch.id === incubationRecord.hatchery_record) || null
+    }
+    onChange={(event, value) => {
+      handleChangeEdit({
+        target: {
+          name: 'hatchery_record',
+          value: value?.id || '',
+        },
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Hatchery Record"
+        variant="outlined"
+        required
+      />
+    )}
+  />
+</FormControl>
+
 
               <br />
               <br />
@@ -508,27 +559,29 @@ const ViewIncubationRecord = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-              <FormControl variant="outlined" fullWidth>
-                <InputLabel id="breed-label">Hatchery Record</InputLabel>
-                <Select
-                  labelId="breed-label"
-                  name="hatchery_record"
-                  value={formData.hatchery_record}
-                  onChange={handleChange}
-                  label="Hatchery Record"
-                  required
-                >
-                  {hatcheryRecords.map((hatch) => (
-                    <MenuItem key={hatch.id} value={hatch.id}>
-                      {hatch.id +
-                        ": " +
-                        getBreedDetails(hatch.breed_of_chicken) +
-                        ": " +
-                        hatch.date_of_transfer}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+  <FormControl variant="outlined" fullWidth>
+  <Autocomplete
+    options={hatcheryRecords}  // Array of hatchery records
+    getOptionLabel={(option) => 
+      `${option.id}: ${getBreedDetails(option.breed_of_chicken)}: ${option.date_of_transfer}`
+    }  // Display hatchery record details
+    onChange={(event, value) => {
+      setFormData({
+        ...formData,
+        hatchery_record: value?.id || "",  // Set the hatchery_record ID in formData
+      });
+    }}
+    renderInput={(params) => (
+      <TextField
+        {...params}
+        label="Select Hatchery Record"
+        variant="outlined"
+        required
+      />
+    )}
+  />
+</FormControl>
+
 
               <br />
               <br />

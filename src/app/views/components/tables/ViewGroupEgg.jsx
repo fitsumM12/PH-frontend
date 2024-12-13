@@ -13,7 +13,7 @@ import {
     Tooltip,
 } from "@mui/material";
 import Autocomplete from '@mui/material/Autocomplete';
-import { FormControl} from '@mui/material';
+import { FormControl } from '@mui/material';
 
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -54,7 +54,7 @@ const ViewGroupEgg = () => {
         afternoon_egg_production: 0,
         total_egg_production: 0,
         collector: user.id,
-        remarks:'this is a remark'
+        remarks: 'this is a remark'
     };
     const [add, setAdd] = useState(false);
     const [del, setDelete] = useState(true)
@@ -65,21 +65,46 @@ const ViewGroupEgg = () => {
     const [houses, setHouses] = useState([]);
     const [breeds, setBreeds] = useState([]);
     const [groupeggs, setGroupEggs] = useState([]);
+    const [filteredGroupEggsForUser, setFilteredGroupEggsForUser] = useState([]);
     const [groupchickens, setGroupChickens] = useState([]);
     const [formData, setFormData] = useState(initialFormData);
     const [combinedData, setCombinedData] = useState({})
 
+    // useEffect(() => {
+    //     const fetchGroupEggs = async () => {
+    //         try {
+    //             const groupeggsData = await getGroupEggs();
+    //             setGroupEggs(groupeggsData);
+    //         } catch (error) {
+    //             console.error('Error fetching chickens:', error);
+    //         }
+    //     };
+    //     fetchGroupEggs();
+    // }, [add, del, edit]);
+
+
+    // Fetch Group Eggs (similar to Group Bodyweights)
     useEffect(() => {
         const fetchGroupEggs = async () => {
             try {
                 const groupeggsData = await getGroupEggs();
                 setGroupEggs(groupeggsData);
             } catch (error) {
-                console.error('Error fetching chickens:', error);
+                console.error('Error fetching eggs:', error);
             }
         };
         fetchGroupEggs();
     }, [add, del, edit]);
+
+    // Filter Group Eggs based on User Role
+    useEffect(() => {
+        if (user.role === "USER") {
+            const filteredData = groupeggs.filter(item => item.collector === user.id);
+            setFilteredGroupEggsForUser(filteredData);
+        } else {
+            setFilteredGroupEggsForUser(groupeggs);
+        }
+    }, [groupeggs, user]);
 
 
     useEffect(() => {
@@ -95,7 +120,7 @@ const ViewGroupEgg = () => {
         fetchGroupChickens();
     }, [add, edit]);
 
-   
+
     useEffect(() => {
         const fetchBreeds = async () => {
             try {
@@ -133,7 +158,7 @@ const ViewGroupEgg = () => {
         const groupchicken = groupchickens.find((h) => h.id === id);
         return groupchicken ? `${groupchicken.id}: ${getBreedDetails(groupchicken.breed)}-${getHouseDetails(groupchicken.house)}` : 'Unknown House';
     };
-    
+
 
     useEffect(() => {
         if (groupchickens.length > 0 && houses.length > 0) {
@@ -152,7 +177,7 @@ const ViewGroupEgg = () => {
 
     const handleDeleteGroupEgg = async (id) => {
         const confirmed = window.confirm("Are you sure you want to delete this group egg record?");
-        
+
         if (confirmed) {
             try {
                 await deleteGroupEgg(id);
@@ -164,7 +189,7 @@ const ViewGroupEgg = () => {
             console.log('Deletion cancelled');
         }
     };
-    
+
 
     const handleChangePage = (_, newPage) => {
         setPage(newPage);
@@ -215,7 +240,7 @@ const ViewGroupEgg = () => {
             [event.target.name]: event.target.value,
         });
     };
-    const handleUpdateEgg= async (e) => {
+    const handleUpdateEgg = async (e) => {
         e.preventDefault();
         try {
             await updateGroupEggInAPI(groupegg.id, groupegg);
@@ -263,7 +288,7 @@ const ViewGroupEgg = () => {
     }
 
     const [searchQuery, setSearchQuery] = useState('');
-    const filteredeggs = groupeggs.filter((egg) =>
+    const filteredeggs = filteredGroupEggsForUser.filter((egg) =>
         String(getGroupDetails(egg.chicken_group)).toLowerCase().includes(searchQuery.toLowerCase())
     );
 
@@ -275,7 +300,7 @@ const ViewGroupEgg = () => {
                         <TableHead>
                             <TableRow>
                                 <TableCell align="center">
-                                <ValidatorForm>
+                                    <ValidatorForm>
                                         <TextValidator
                                             label="Group ID"
                                             onChange={(e) => setSearchQuery(e.target.value)}
@@ -293,12 +318,12 @@ const ViewGroupEgg = () => {
                                 <TableCell align="right">
                                     Action | <Button onClick={addNew}>Add New</Button>
                                 </TableCell>
-                                
-                                {user.role!=="USER"?( 
-                                <TableCell align="left">
-                                    <Button onClick={handleDownLoad}>Download</Button>
-                                </TableCell>):(null)}
-                                
+
+                                {user.role !== "USER" ? (
+                                    <TableCell align="left">
+                                        <Button onClick={handleDownLoad}>Download</Button>
+                                    </TableCell>) : (null)}
+
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -320,18 +345,18 @@ const ViewGroupEgg = () => {
                                                 <EditIcon sx={{ color: 'green' }} />
                                             </IconButton>
                                         </Tooltip>
-                                        
-                                        
-                                    
-                                    {user.role!=="USER"?( <Tooltip title="Delete">
+
+
+
+                                        {user.role !== "USER" ? (<Tooltip title="Delete">
                                             <IconButton onClick={() => handleDeleteGroupEgg(groupegg.id)} sx={{ '&:hover': { bgcolor: 'grey.200' } }}>
                                                 <DeleteIcon sx={{ color: 'red' }} />
                                             </IconButton>
-                                        </Tooltip>):(null)}
+                                        </Tooltip>) : (null)}
                                     </TableCell>
-                                    
-                                    {user.role!=="USER"?( 
-                                    <TableCell align="center"></TableCell>):(null)}
+
+                                    {user.role !== "USER" ? (
+                                        <TableCell align="center"></TableCell>) : (null)}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -354,7 +379,7 @@ const ViewGroupEgg = () => {
                     <ValidatorForm onSubmit={handleUpdateEgg} onError={() => null}>
                         <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-                                <FormControl variant="outlined" fullWidth>
+                                {/* <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
                                         options={combinedData}
                                         getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
@@ -373,7 +398,31 @@ const ViewGroupEgg = () => {
                                             />
                                         )}
                                     />
+                                </FormControl> */}
+
+                                <FormControl variant="outlined" fullWidth>
+                                    <Autocomplete
+                                        options={combinedData}
+                                        getOptionLabel={(option) => `Group ID:${option.id}_House:${option.house_number}_Pen:${option.pen_number}`}
+                                        value={combinedData.find((group) => group.id === groupegg.chicken_group) || null}
+                                        onChange={(event, value) => {
+                                            setGroupEgg({
+                                                ...groupegg,
+                                                chicken_group: value?.id || '',
+                                            });
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Select Group"
+                                                variant="outlined"
+                                                required
+                                            />
+                                        )}
+                                    />
                                 </FormControl>
+
+
                                 <br />
                                 <br />
                                 <TextField
@@ -410,7 +459,7 @@ const ViewGroupEgg = () => {
 
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
 
-                            <TextField
+                                <TextField
                                     type="number"
                                     name="total_egg_production"
                                     label="Total Egg"
@@ -432,8 +481,8 @@ const ViewGroupEgg = () => {
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
-                                 
-                            <TextField
+
+                                <TextField
                                     type="text"
                                     name="remarks"
                                     label="remarks"
@@ -451,7 +500,7 @@ const ViewGroupEgg = () => {
                             </IconButton>
                         </Tooltip>
                         &nbsp;&nbsp;&nbsp;
-                        
+
                         <Button
                             sx={{
                                 backgroundColor: '#30BA4E',
@@ -469,7 +518,7 @@ const ViewGroupEgg = () => {
                     </ValidatorForm>
                 ) : (
                     <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
-                          <Grid container spacing={6}>
+                        <Grid container spacing={6}>
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
                                 <FormControl variant="outlined" fullWidth>
                                     <Autocomplete
@@ -527,7 +576,7 @@ const ViewGroupEgg = () => {
 
                             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
 
-                            <TextField
+                                <TextField
                                     type="number"
                                     name="total_egg_production"
                                     label="Total Egg"
@@ -549,8 +598,8 @@ const ViewGroupEgg = () => {
                                     validators={["required"]}
                                     errorMessages={["This field is required"]}
                                 />
-                                 
-                            <TextField
+
+                                <TextField
                                     type="text"
                                     name="remarks"
                                     label="remarks"
