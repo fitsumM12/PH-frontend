@@ -33,6 +33,7 @@ const StyledScrollBar = styled(Scrollbar)(() => ({
   flexDirection: "column"
 }));
 
+
 const LayoutContainer = styled(Box)(({ width, open }) => ({
   height: "100vh",
   display: "flex",

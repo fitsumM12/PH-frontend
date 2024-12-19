@@ -5,10 +5,12 @@ import { Layouts } from "./index";
 export default function Layout(props) {
   const { settings } = useSettings();
   const Layout = Layouts[settings.activeLayout];
-
+// here is also add
   return (
     <MainSuspense>
       <Layout {...props} />
     </MainSuspense>
   );
 }
+
+

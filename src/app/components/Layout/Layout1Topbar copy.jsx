@@ -1,19 +1,18 @@
 import { memo } from "react";
 import { Box, styled, Avatar, Hidden, useTheme, MenuItem, IconButton, useMediaQuery } from "@mui/material";
-import { Menu, Person, PowerSettingsNew } from "@mui/icons-material";
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import { useNavigate } from "react-router-dom";
 import useAuth from "app/hooks/useAuth";
 import useSettings from "app/hooks/useSettings";
 import { Span } from "app/components/Typography";
 import { MainMenu } from "app/components";
 import { themeShadows } from "app/components/Theme/themeColors";
 import { topBarHeight } from "app/utils/constant";
-
+import { Menu, Person, Settings, PowerSettingsNew } from "@mui/icons-material";
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 // STYLED COMPONENTS
 const StyledIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.primary
 }));
+import { useNavigate } from "react-router-dom";
 
 const TopbarRoot = styled("div")({
   top: 0,
@@ -30,8 +29,11 @@ const TopbarContainer = styled(Box)(({ theme }) => ({
   height: "100%",
   display: "flex",
   alignItems: "center",
+  borderBottom: '1.5px solid #d19a0',
   justifyContent: "space-between",
-  background: theme.palette.primary.main
+  background: theme.palette.primary.main,
+  [theme.breakpoints.down("sm")]: { paddingLeft: 16, paddingRight: 16 },
+  [theme.breakpoints.down("xs")]: { paddingLeft: 14, paddingRight: 16 }
 }));
 
 const UserMenu = styled(Box)({
@@ -47,29 +49,61 @@ const StyledItem = styled(MenuItem)(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   minWidth: 185,
+  "& a": {
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    textDecoration: "none"
+  },
   "& span": { marginRight: "10px", color: theme.palette.text.primary }
 }));
 
+// TO MAKE AVATAR
+const getInitials = (firstName, lastName) => {
+  if (!firstName || !lastName) {
+    return '?'; // Default if either name is missing
+  }
+  return firstName[0] + lastName[0];
+};
+
+// MAIN
+const renderAvatar = (user) => {
+  if (!user || !user.first_name || !user.last_name) {
+    return <Avatar sx={{ cursor: 'pointer', backgroundColor: '#23297a' }}>?</Avatar>; // Fallback Avatar
+  }
+
+  const initials = getInitials(user.first_name, user.last_name);
+  return <Avatar sx={{ cursor: 'pointer', backgroundColor: '#23297a' }}>{initials}</Avatar>;
+};
+
 const Layout1Topbar = () => {
   const theme = useTheme();
-  const navigate = useNavigate();
   const { settings, updateSettings } = useSettings();
   const { logout, user } = useAuth();
+
+  // Move all hooks to the top, including useMediaQuery
   const isMdScreen = useMediaQuery(theme.breakpoints.down("md"));
 
-  if (!user) return <div>Loading...</div>; // Ensure hooks are not used conditionally
+  // Check if the user is loading or undefined
+  if (!user) {
+    return <div>Loading...</div>; // Fallback UI while user data is loading
+  }
 
   const updateSidebarMode = (sidebarSettings) => {
     updateSettings({ layout1Settings: { leftSidebar: { ...sidebarSettings } } });
   };
 
   const handleSidebarToggle = () => {
-    const { layout1Settings } = settings;
-    const mode = isMdScreen
-      ? layout1Settings.leftSidebar.mode === "close" ? "mobile" : "close"
-      : layout1Settings.leftSidebar.mode === "full" ? "close" : "full";
+    let { layout1Settings } = settings;
+    let mode;
+    if (isMdScreen) {
+      mode = layout1Settings.leftSidebar.mode === "close" ? "mobile" : "close";
+    } else {
+      mode = layout1Settings.leftSidebar.mode === "full" ? "close" : "full";
+    }
     updateSidebarMode({ mode });
   };
+  const navigate = useNavigate();
 
   return (
     <TopbarRoot>
@@ -79,20 +113,30 @@ const Layout1Topbar = () => {
             <Menu />
           </StyledIconButton>
         </Box>
+
         <Box display="flex" alignItems="center">
-          <Span><h4>{user.first_name}</h4></Span>
+          <Span>
+            <h4>{user.first_name}</h4>
+          </Span>
           <MainMenu
             menuButton={
               <UserMenu>
-                <Hidden xsDown />
-                <AccountCircleIcon style={{ color: '#00004D', height: '30px', width: '30px' }} />
+                <Hidden xsDown>
+                </Hidden>
+                <AccountCircleIcon style={{ color: '#00004D', height: '30px', width: '30px', margin: 2 }} />
+
               </UserMenu>
             }
           >
-            <StyledItem onClick={() => navigate('/dashboard-profile')}>
+            {/* <StyledItem>
+              <Person />
+              <Span>Profile</Span>
+            </StyledItem> */}
+            <StyledItem onClick={() => navigate('/profile')}>
               <Person />
               <Span>Profile</Span>
             </StyledItem>
+
             <StyledItem onClick={logout}>
               <PowerSettingsNew />
               <Span>Logout</Span>

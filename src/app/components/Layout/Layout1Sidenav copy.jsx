@@ -5,7 +5,6 @@ import Brand from "app/components/Brand";
 import Sidenav from "app/components/Sidenav";
 import { themeShadows } from "app/components/Theme/themeColors";
 import { convertHexToRGB } from "app/utils/utils";
-import  ProfileProvider  from "app/views/components/tables/ManageDashboardProfile";
 import { sidenavCompactWidth, sideNavWidth } from "app/utils/constant";
 // STYLED COMPONENTS
 const SidebarNavRoot = styled(Box)(({ theme, width, bg, image }) => ({
@@ -70,7 +69,6 @@ const Layout1Sidenav = () => {
 
   return (
     <SidebarNavRoot image={bgImgURL} bg={primaryRGB} width={getSidenavWidth()}>
-
       <NavListBox>
         <Brand>
           <Hidden smDown>
@@ -85,7 +83,6 @@ const Layout1Sidenav = () => {
         <Sidenav />
       </NavListBox>
     </SidebarNavRoot>
-    
   );
 };
 

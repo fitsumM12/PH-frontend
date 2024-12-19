@@ -17,6 +17,7 @@ const ManageGroupRecord = Loadable(lazy(() => import("app/views/components/table
 const ManageHatcheryUnit = Loadable(lazy(() => import("app/views/components/tables/ManageHatcheryUnit")));
 const ManageChickenDistribution = Loadable(lazy(() => import("app/views/components/tables/ManageChickenDistribution")));
 const ManageUser = Loadable(lazy(() => import("app/views/components/tables/ManageUser")));
+const ManageDashboardProfile = Loadable(lazy(() => import("app/views/components/tables/ManageDashboardProfile")));
 
 const routes = [
   {
@@ -33,6 +34,7 @@ const routes = [
       { path: "/hatcheryunit", element:<ManageHatcheryUnit/>},
       { path: "/chickendistribution", element:<ManageChickenDistribution/>},
       { path: "/manageuser", element:<ManageUser/>},
+      { path: "/dashboard-profile", element:<ManageDashboardProfile/>},
       { path: "*", element: <NotFound /> }
     ]
   },

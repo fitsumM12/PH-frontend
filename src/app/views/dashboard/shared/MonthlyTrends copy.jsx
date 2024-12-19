@@ -280,7 +280,7 @@ const MonthlyTrends = () => {
         boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Grid container spacing={3} alignItems="center" >
+      <Grid container spacing={3} alignItems="center">
         <Grid item lg={1} md={1} sm={0} xs={0}></Grid>
         <Grid item lg={3} md={3} sm={4} xs={4}>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -307,8 +307,8 @@ const MonthlyTrends = () => {
         </Grid>
       </Grid>
       <Typography variant="h6" gutterBottom></Typography>
-      <ResponsiveContainer width="100%" height={200}  >
-        <LineChart data={processIndividualChartData} >
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={processIndividualChartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis />
@@ -372,7 +372,7 @@ const MonthlyTrends = () => {
       </Grid>
 
       <ResponsiveContainer width="100%" height={200}>
-        <LineChart data={processGroupChartData} lg={6}>
+        <LineChart data={processGroupChartData}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="month" />
           <YAxis />
@@ -397,5 +397,3 @@ const MonthlyTrends = () => {
 };
 
 export default MonthlyTrends;
-
-

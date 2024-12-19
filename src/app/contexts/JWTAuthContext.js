@@ -102,7 +102,6 @@ export const AuthProvider = ({ children }) => {
             dispatch({ type: "LOGOUT" });
             return;
           }
-
           dispatch({
             type: "INIT",
             payload: { isAuthenticated: true, user },
@@ -134,3 +133,5 @@ export const AuthProvider = ({ children }) => {
 };
 
 export default AuthContext;
+
+

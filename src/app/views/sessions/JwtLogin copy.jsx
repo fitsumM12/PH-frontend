@@ -1,25 +1,29 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import {useNavigate } from "react-router-dom";
 import { Card, Grid, TextField, Box, styled } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 import { Formik } from "formik";
-import axios from "axios";
 import * as Yup from "yup";
 
 import useAuth from "app/hooks/useAuth";
 import Brand from "app/components/Brand";
 
+// const FlexBox = styled(Box)(() => ({
+//   display: "flex"
+// }));
+
 const ContentBox = styled("div")(() => ({
   height: "100%",
   padding: "32px",
   position: "relative",
-  background: "rgba(0, 0, 0, 0.01)",
+  background: "rgba(0, 0, 0, 0.01)"
 }));
 
 const StyledRoot = styled("div")(() => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  // backgroundColor: "#1A2038",
   minHeight: "100% !important",
   "& .card": {
     maxWidth: 800,
@@ -27,53 +31,38 @@ const StyledRoot = styled("div")(() => ({
     margin: "1rem",
     display: "flex",
     borderRadius: 12,
-    alignItems: "center",
+    alignItems: "center"
   },
+
   ".img-wrapper": {
     height: "100%",
     minWidth: 320,
     display: "flex",
     padding: "2rem",
     alignItems: "center",
-    justifyContent: "center",
-  },
+    justifyContent: "center"
+  }
 }));
 
 const initialValues = {
   email: "",
   password: "",
-  remember: true,
+  remember: true
 };
 
 const validationSchema = Yup.object().shape({
   password: Yup.string()
     .min(6, "Password must be 6 character length")
     .required("Password is required!"),
-  email: Yup.string().email("Invalid Email address").required("Email is required!"),
+  email: Yup.string().email("Invalid Email address").required("Email is required!")
 });
 
 export default function JwtLogin() {
+  // const theme = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [landingPageImage, setLandingPageImage] = useState("/assets/images/screening.gif");
 
   const { login } = useAuth();
-
-  useEffect(() => {
-    const fetchLandingPageImage = async () => {
-      try {
-        const response = await axios.get("http://localhost:8000/api/landingpage-image/");
-        setLandingPageImage(response.data.landingpage_image); // Corrected key
-      } catch (error) {
-        console.error("Error fetching landing page image:", error);
-      }
-    };
-  
-    fetchLandingPageImage();
-  }, []);
-  
-  
-console.log( "This is LandingPage Image"+" "+ landingPageImage);
 
   const handleFormSubmit = async (values) => {
     setLoading(true);
@@ -89,37 +78,28 @@ console.log( "This is LandingPage Image"+" "+ landingPageImage);
 
   return (
     <StyledRoot>
-      <Card
-        className="card"
-        style={{
-          padding: 20,
-          borderRadius: 10,
-          border: "1px solid rgba(95, 96, 164, 0.5)",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-        }}
-      >
+      <Card className="card"  style={{
+            padding: 20,
+            borderRadius: 10,
+            border: '1px solid rgba(95, 96, 164, 0.5)',
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+        }} >
         <Grid container>
           <Grid item sm={6} xs={12}>
             <div className="img-wrapper">
-              <img
-                src={landingPageImage}
-                style={{ borderRadius: 20 }}
-                width="100%"
-                alt="Landing Page"
-              />
+              <img src="/assets/images/screening.gif" style={{ borderRadius: 20 }} width="100%" alt="" />
             </div>
           </Grid>
 
           <Grid item sm={6} xs={12}>
-            <Box display="flex" justifyContent="center" mt={5} ml={-3}>
+            <Box display="flex" justifyContent="center" mt={5} ml={-3} >
               <Brand />
             </Box>
-            <ContentBox>
+            <ContentBox >
               <Formik
                 onSubmit={handleFormSubmit}
                 initialValues={initialValues}
-                validationSchema={validationSchema}
-              >
+                validationSchema={validationSchema}>
                 {({ values, errors, touched, handleChange, handleBlur, handleSubmit }) => (
                   <form onSubmit={handleSubmit}>
                     <TextField
@@ -151,19 +131,13 @@ console.log( "This is LandingPage Image"+" "+ landingPageImage);
                       error={Boolean(errors.password && touched.password)}
                       sx={{ mb: 1.5 }}
                     />
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
                       <LoadingButton
                         type="submit"
-                        style={{ backgroundColor: "#19B839" }}
+                        style={{ backgroundColor: '#19B839' }}
                         loading={loading}
                         variant="contained"
-                        sx={{ my: 2, borderRadius: 5, width: "60%" }}
+                        sx={{ my: 2, borderRadius: 5, width: '60%' }}
                       >
                         Login
                       </LoadingButton>
