@@ -173,7 +173,7 @@ export const StatCards = () => {
       </Grid>
       <Grid container spacing={1} >
         {cardList.map(({ amount, Icon, name, color }) => (
-          <Grid item xs={6} md={6} lg={6} key={name}>
+          <Grid item xs={4} md={4} lg={4} key={name}>
             <StyledCard elevation={2}>
               <ContentBox>
                 <Icon className="icon" style={{ color }} />
