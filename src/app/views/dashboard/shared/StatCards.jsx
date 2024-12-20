@@ -136,24 +136,8 @@ export const StatCards = () => {
 
   return (
     <>
-      <Grid container spacing={2} sx={{ mb: "24px" }} >
-        {cardList.map(({ amount, Icon, name, color }) => (
-          <Grid item xs={6} md={6} lg={6} key={name}>
-            <StyledCard elevation={2}>
-              <ContentBox>
-                <Icon className="icon" style={{ color }} />
-                <Box>
-                  <Heading>{amount}</Heading>
-                  <Small>{name}</Small>
-                </Box>
-              </ContentBox>
-            </StyledCard>
-          </Grid>
-        ))}
-      </Grid>
-
-      {/* Table inside a card */}
-      <Grid item xs={12}>
+         {/* Table inside a card */}
+         <Grid item xs={12} sx={{ mb: "10px" }} >
         <StyledCard elevation={2}>
           <Typography variant="h6" gutterBottom>
             Top 3 Egg-Producing Chicken Groups
@@ -187,6 +171,23 @@ export const StatCards = () => {
           </TableContainer>
         </StyledCard>
       </Grid>
+      <Grid container spacing={1} >
+        {cardList.map(({ amount, Icon, name, color }) => (
+          <Grid item xs={6} md={6} lg={6} key={name}>
+            <StyledCard elevation={2}>
+              <ContentBox>
+                <Icon className="icon" style={{ color }} />
+                <Box>
+                  <Heading>{amount}</Heading>
+                  <Small>{name}</Small>
+                </Box>
+              </ContentBox>
+            </StyledCard>
+          </Grid>
+        ))}
+      </Grid>
+
+ 
     </>
   );
 }

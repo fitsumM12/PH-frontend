@@ -74,7 +74,7 @@ export default function ManageHatcheryUnit() {
             Incubation
           </Button>
         </Grid>
-        <Grid item xs={8} sm={6} lg={2}>
+        <Grid item xs={8} sm={6} lg={3}>
           <Button
             fullWidth
             variant={view === "hatchery_summary" ? "contained" : "outlined"}

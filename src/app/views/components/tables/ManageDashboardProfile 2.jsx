@@ -21,6 +21,7 @@ const FormBox = styled(Box)(({ theme }) => ({
     boxShadow: theme.shadows[2],
 }));
 
+
 export default function ManageDashboardProfile() {
     const [bio, setBio] = useState("");
     const [dashboardImage, setDashboardImage] = useState(null);
@@ -31,14 +32,12 @@ export default function ManageDashboardProfile() {
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                // Fetch dashboard profile data
-                const profileResponse = await axios.get("http://localhost:8000/api/dashboard-profile/");
+                 const profileResponse = await axios.get("http://localhost:8000/api/dashboard-profile/");
                 setBio(profileResponse.data.bio);
                 setDashboardImage(profileResponse.data.dashboard_image);
                 setPreviewDashboardImage(profileResponse.data.dashboard_image);
 
-                // Fetch landing page image
-                const landingPageResponse = await axios.get("http://localhost:8000/api/landingpage-image/");
+                 const landingPageResponse = await axios.get("http://localhost:8000/api/landingpage-image/");
                 setLandingpageImage(landingPageResponse.data.landingpage_image);
                 setPreviewLandingpageImage(landingPageResponse.data.landingpage_image);
             } catch (error) {
@@ -49,6 +48,7 @@ export default function ManageDashboardProfile() {
         fetchProfileData();
     }, []);
 
+    console.log("Submitting:", { bio, dashboardImage, landingpageImage });
     const handleImageChange = (event, setImage, setPreview) => {
         const file = event.target.files[0];
         if (file) {
@@ -59,40 +59,28 @@ export default function ManageDashboardProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Check if bio is empty
-        if (!bio) {
-            alert("Bio is required.");
-            return;
-        }
-
+    
         const formData = new FormData();
-        
-        // Append dashboard image if user uploaded a new one
-        if (dashboardImage) {
+    
+         if (bio) {
+            formData.append("bio", bio);
+        }
+    
+         if (dashboardImage && dashboardImage !== previewDashboardImage) {
             formData.append("dashboard_image", dashboardImage);
-        } else {
-            formData.append("dashboard_image", previewDashboardImage); // Keep the existing image
         }
-
-        // Append landing page image if user uploaded a new one
-        if (landingpageImage) {
+    
+        if (landingpageImage && landingpageImage !== previewLandingpageImage) {
             formData.append("landingpage_image", landingpageImage);
-        } else {
-            formData.append("landingpage_image", previewLandingpageImage); // Keep the existing image
         }
-
-        // Append bio
-        formData.append("bio", bio);
-
+    
         try {
             const response = await axios.patch("http://localhost:8000/api/dashboard-profile/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                    Authorization: `Bearer ${token}`,
-                },
+                 },
             });
-
+    
             console.log("Success:", response.data);
             alert("Profile updated successfully!");
         } catch (error) {
@@ -100,7 +88,7 @@ export default function ManageDashboardProfile() {
             alert("Failed to update profile. Please try again.");
         }
     };
-
+    
     return (
         <Container>
             <RecordManageCard>
@@ -109,10 +97,8 @@ export default function ManageDashboardProfile() {
                         Update Dashboard Profile
                     </Typography>
 
-                    {/* Image Upload Sections */}
-                    <Box display="flex" justifyContent="space-between" mt={3}>
-                        {/* Dashboard Image Section */}
-                        <Box display="flex" flexDirection="column" alignItems="center" flex={1} mr={2}>
+                     <Box display="flex" justifyContent="space-between" mt={3}>
+                         <Box display="flex" flexDirection="column" alignItems="center" flex={1} mr={2}>
                             <Avatar
                                 src={previewDashboardImage || "/static/images/avatar-placeholder.png"}
                                 alt="Dashboard Preview"
@@ -143,7 +129,6 @@ export default function ManageDashboardProfile() {
                             </Typography>
                         </Box>
 
-                        {/* Landing Page Image Section */}
                         <Box display="flex" flexDirection="column" alignItems="center" flex={1}>
                             <Avatar
                                 src={previewLandingpageImage || "/static/images/avatar-placeholder.png"}
@@ -176,8 +161,7 @@ export default function ManageDashboardProfile() {
                         </Box>
                     </Box>
 
-                    {/* Bio Text Field */}
-                    <Box
+                     <Box
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -197,8 +181,7 @@ export default function ManageDashboardProfile() {
                         />
                     </Box>
 
-                    {/* Save Button */}
-                    <Box
+                     <Box
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
