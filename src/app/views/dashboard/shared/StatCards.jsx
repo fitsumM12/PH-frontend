@@ -12,6 +12,7 @@ import { getIncubationRecords } from "app/apis/hatchery_unit_api";
 import { getHatcherRecords } from "app/apis/hatchery_unit_api";
 import { getHatcherSummarys } from "app/apis/hatchery_unit_api";
 import { getGroupEggs } from "app/apis/group_chicken_api";
+import { getNewGroupEggs } from "app/apis/group_chicken_api";
 import { useEffect, useState } from "react";
 // import { styled, TableRow } from "@mui/material";
 
@@ -103,14 +104,11 @@ export const StatCards = () => {
     useEffect(() => {
       const fetchTopThreeEggProduction = async () => {
         try {
-          // Fetch egg production data
-          const eggData = await getGroupEggs();
+           const eggData = await getNewGroupEggs ();
 
           if (Array.isArray(eggData)) {
-            // Sort the egg production data in descending order of total egg production
-            const sortedEggData = eggData.sort((a, b) => b.total_egg_production - a.total_egg_production);
+             const sortedEggData = eggData.sort((a, b) => b.total_egg_production - a.total_egg_production);
 
-            // Get the top 3 highest egg-producing groups
             const topThree = sortedEggData.slice(0, 3);
             setTopThreeGroups(topThree);
           }
@@ -136,8 +134,8 @@ export const StatCards = () => {
 
   return (
     <>
-         {/* Table inside a card */}
-         <Grid item xs={12} sx={{ mb: "10px" }} >
+      {/* Table inside a card */}
+      <Grid item xs={12} sx={{ mb: "10px" }} >
         <StyledCard elevation={2}>
           <Typography variant="h6" gutterBottom>
             Top 3 Egg-Producing Chicken Groups
@@ -146,7 +144,7 @@ export const StatCards = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Group ID</TableCell>
+                  <TableCell align="center">House Number</TableCell>
                   <TableCell align="center">Number of Eggs</TableCell>
                 </TableRow>
               </TableHead>
@@ -154,7 +152,7 @@ export const StatCards = () => {
                 {topThreeGroups.length > 0 ? (
                   topThreeGroups.map((group) => (
                     <HoverableTableRow key={group.id}>
-                      <TableCell align="center">{group.chicken_group}</TableCell>
+                      <TableCell align="center">{group.chicken_group.house}</TableCell>
                       <TableCell align="center">{group.total_egg_production}</TableCell>
                     </HoverableTableRow>
                   ))
@@ -167,13 +165,14 @@ export const StatCards = () => {
                 )}
               </TableBody>
 
+
             </Table>
           </TableContainer>
         </StyledCard>
       </Grid>
       <Grid container spacing={1} >
         {cardList.map(({ amount, Icon, name, color }) => (
-          <Grid item xs={4} md={4} lg={4} key={name}>
+          <Grid item xs={6} md={6} lg={6} key={name}>
             <StyledCard elevation={2}>
               <ContentBox>
                 <Icon className="icon" style={{ color }} />
@@ -186,8 +185,6 @@ export const StatCards = () => {
           </Grid>
         ))}
       </Grid>
-
- 
     </>
   );
 }

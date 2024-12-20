@@ -278,6 +278,23 @@ export const getGroupEggs = async () => {
     }
 };
 
+
+// FETCH ALL NEW EGG
+export const getNewGroupEggs = async () => {
+    try {
+        const response = await axios.get(`${CHICKEN_API_URL}new_group_egg/list/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+        // console.log(response);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching new group eggs:', error);
+        throw error;
+    }
+};
+
 // FETCH SINGLE EGG
 export const getGroupEgg = async (egg_id) => {
     try {

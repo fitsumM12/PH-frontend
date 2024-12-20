@@ -3,6 +3,9 @@ import { Box, Button, TextField, Typography, styled, Avatar } from "@mui/materia
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import RecordManageCard from 'app/views/components/RecordManageCard';
 import axios from "axios";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDove } from "@fortawesome/free-solid-svg-icons";
+import { faUserEdit } from '@fortawesome/free-solid-svg-icons'; 
 
 const token = localStorage.getItem('token');
 
@@ -18,7 +21,7 @@ const FormBox = styled(Box)(({ theme }) => ({
     padding: "24px",
     borderRadius: "8px",
     background: theme.palette.background.paper,
-    boxShadow: theme.shadows[2],
+    boxShadow: theme.shadows[0],
 }));
 
 
@@ -83,6 +86,7 @@ export default function ManageDashboardProfile() {
     
             console.log("Success:", response.data);
             alert("Profile updated successfully!");
+            window.location.reload();
         } catch (error) {
             console.error("Error:", error);
             alert("Failed to update profile. Please try again.");
@@ -93,9 +97,36 @@ export default function ManageDashboardProfile() {
         <Container>
             <RecordManageCard>
                 <FormBox>
-                    <Typography variant="h5" fontWeight="bold" gutterBottom>
-                        Update Dashboard Profile
-                    </Typography>
+                <Box
+  sx={{
+    display: 'flex',         
+    alignItems: 'center',    
+    gap: 2,                  
+    mb: { xs: 2, sm: 0 },    
+  }}
+>
+  <Box
+    sx={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+    //   backgroundColor: '#FFF7E0',  
+      borderRadius: '50%',        
+      padding: 2,                  
+    }}
+  >
+    <FontAwesomeIcon
+      icon={faUserEdit}
+      color="#ECAE1F"
+      style={{ fontSize: '32px' }}
+    />
+  </Box>
+  
+  <Typography variant="h5" fontWeight="bold" gutterBottom>
+    Update Dashboard Profile
+  </Typography>
+</Box>
+
 
                      <Box display="flex" justifyContent="space-between" mt={3}>
                          <Box display="flex" flexDirection="column" alignItems="center" flex={1} mr={2}>
@@ -169,7 +200,7 @@ export default function ManageDashboardProfile() {
                         }}
                     >
                         <TextField
-                            label="Bio"
+                            label="Company Name"
                             multiline
                             rows={1}
                             variant="outlined"
@@ -194,7 +225,7 @@ export default function ManageDashboardProfile() {
                             onClick={handleSubmit}
                             size="large"
                             sx={{
-                                width: '10%',
+                                width: '15%',
                                 margin: '0 20%',
                             }}
                         >

@@ -25,7 +25,7 @@ const Container = styled("div")(({ theme }) => ({
 export default function ManageGroupRecord() {
     const [view, setView] = useState('chicken');
 
-    // Handle button clicks to change view
+ 
     const handleViewChange = (newView) => {
         setView(newView);
     };
@@ -38,9 +38,9 @@ export default function ManageGroupRecord() {
     <Box display="flex" alignItems="center" flexDirection={{ xs: "column", sm: "row" }} width="100%">
         <Box
             sx={{
-                display: "inline-flex", // Ensures it behaves like an inline element
-                mb: { xs: 2, sm: 0 },   // Adjust margin-bottom for smaller screens
-                mr: 2,                  // Margin-right (replaces style prop in FontAwesomeIcon)
+                display: "inline-flex",  
+                mb: { xs: 2, sm: 0 },   
+                mr: 2,                  
             }}
         >
             <FontAwesomeIcon

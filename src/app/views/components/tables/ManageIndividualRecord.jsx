@@ -36,9 +36,9 @@ export default function ManageIndividualRecord() {
     <Box display="flex" alignItems="center" flexDirection={{ xs: "column", sm: "row" }} width="100%">
     <Box
     sx={{
-        display: "inline-flex", // Ensures it behaves like an inline element
-        mb: { xs: 2, sm: 0 },   // Adjust margin-bottom for smaller screens
-        mr: 2,                  // Margin-right (replaces style prop in FontAwesomeIcon)
+        display: "inline-flex",  
+        mb: { xs: 2, sm: 0 },    
+        mr: 2,                   
     }}
 >
     <FontAwesomeIcon
@@ -52,7 +52,7 @@ export default function ManageIndividualRecord() {
             display="grid"
             gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(3, 1fr)', md: 'repeat(6, 1fr)' }}
             gap={1}
-            width="80%"
+            width="100%"
         >
             <Button
                 variant={view === 'chicken' ? 'contained' : 'outlined'}
