@@ -25,15 +25,25 @@ export default function ManageRecord() {
     return (
         <Container>
             <RecordManageCard>
-   
             <Box
-  display="grid"
-  gridTemplateColumns={{ xs: 'repeat(2, 1fr)', sm: 'repeat(2, minmax(0, 150px))' }} // Two buttons per row on smaller screens and limit width on larger screens
-  gap={2} // Add spacing between buttons
+  display="inline-flex" // Use inline-flex to align the icon and buttons in a row
+  alignItems="center" // Vertically align items to center
+  gap={2} // Add spacing between the icon and buttons
 >
+  {/* Icon on the left */}
+  <Box
+    sx={{
+      display: "inline-flex",
+    }}
+  >
+    <FontAwesomeIcon
+      icon={faDove}
+      color="#ECAE1F"
+      style={{ fontSize: '32px' }}
+    />
+  </Box>
 
-    
-
+  {/* Buttons next to the icon */}
   <Button
     variant={view === 'breed' ? 'contained' : 'outlined'}
     onClick={() => handleViewChange('breed')}
@@ -65,9 +75,6 @@ export default function ManageRecord() {
     Manage House
   </Button>
 </Box>
-
-
-
 
 
                 <Box width="100%" overflow="auto">

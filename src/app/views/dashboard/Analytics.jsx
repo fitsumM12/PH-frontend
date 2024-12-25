@@ -17,10 +17,10 @@ export default function Analytics() {
     <Fragment>
       <ContentBox className="analytics">
         <Grid container spacing={2}>
-          <Grid item lg={8} md={8} sm={12} xs={12}>
+          <Grid item lg={7} md={8} sm={12} xs={12}>
             <MonthlyTrends/>
           </Grid>
-          <Grid item lg={4} md={4} sm={12} xs={12}>
+          <Grid item lg={5} md={4} sm={12} xs={12}>
             <StatCards />
             {/* <DoctorDoughnut /> */}
           </Grid>

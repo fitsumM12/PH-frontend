@@ -79,25 +79,35 @@ const ViewIndividualEgg = () => {
   useEffect(() => {
     const fetchChickensAndDeaths = async () => {
       try {
-          const chickensData = await getChickens();  
-          const deathsData = await getIndividualDeaths();  
-          
-          const deadBirdIds = new Set(
-              deathsData.filter((death) => death.condition.toLowerCase() === "dead")
-                         .map((death) => death.bird)
-          );
+        const chickensData = await getChickens();  
+        const deathsData = await getIndividualDeaths();  
+        console.log("Chickens data:", chickensData);
+        console.log("Deaths data:", deathsData);
   
-          // Remove gender filtering for now
-          const alive = chickensData.filter(chicken => !deadBirdIds.has(chicken.id));
-  
-          setAliveChickens(alive);
-          console.log("Alive Chickens:", alive); // Check the data structure
+
+        // Create a set of dead bird IDs for quick lookup
+        const deadBirdIds = new Set(
+          deathsData
+            .filter((death) => death.condition.toLowerCase() === "dead") 
+            .map((death) => death.bird)  
+        );
+
+         const alive = chickensData.filter(
+          (chicken) =>
+            !deadBirdIds.has(chicken.id) &&  
+            chicken.sex.toLowerCase() === genderFilter 
+        );
+
+        setAliveChickens(alive); 
+        console.log(alive);
+
       } catch (error) {
-          console.error("Error fetching chickens or death records:", error);
+        console.error("Error fetching chickens or death records:", error);
       }
-  };
+    };
+
     fetchChickensAndDeaths();  
-}, []);
+  }, [genderFilter]); 
 
 
 
@@ -495,7 +505,6 @@ const ViewIndividualEgg = () => {
         <ValidatorForm onSubmit={handleSubmit} onError={() => null}>
           <Grid container spacing={2}>
             <Grid item lg={6} md={6} sm={12} xs={12} sx={{ mt: 2 }}>
-
               <FormControl variant="outlined" fullWidth>
                 <Autocomplete
                   options={aliveChickens}
@@ -508,7 +517,28 @@ const ViewIndividualEgg = () => {
                       bird: value?.id || "",
                     });
                   }}
-                  
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Select Chicken"
+                      variant="outlined"
+                      required
+                    />
+                  )}
+                />
+              </FormControl>
+              <FormControl variant="outlined" fullWidth>
+                <Autocomplete
+                  options={aliveChickens}
+                  getOptionLabel={(option) =>
+                    `Chicken ID: ${option.bird_id}, Hatch: ${option.hatch} Sire: ${option.sire_id}, Dam: ${option.dam_id}`
+                  }
+                  onChange={(event, value) => {
+                    setFormData({
+                      ...formData,
+                      bird: value?.id || "",
+                    });
+                  }}
                   renderInput={(params) => (
                     <TextField
                       {...params}

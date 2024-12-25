@@ -97,7 +97,7 @@ const MonthlyTrends = () => {
         getMonthlyIndividualFeedIntakeRefusal(),
         getMonthlyIndividualBodyweight(),
         getMonthlyIndividualVaccination(),
-        getMonthlyIndividualDeathCount(), // Add this
+        getMonthlyIndividualDeathCount(),  
 
       ]);
       console.log("Individual Death Counts: ", individualDeathCounts);
@@ -161,7 +161,7 @@ const MonthlyTrends = () => {
               month: monthStr,
               total_egg_production: 0,
               vaccination_count: 0,
-              death_count: 0, // Add this
+              death_count: 0, 
               total_feed_intake: 0,
               average_body_weight: 0,
               record_count: 0,
@@ -169,9 +169,9 @@ const MonthlyTrends = () => {
           }
   
           individualData[monthStr].total_egg_production += record.total_egg_production || 0;
-          individualData[monthStr].vaccination_count += record.total_vaccinations || 0; // Updated line
+          individualData[monthStr].vaccination_count += record.total_vaccinations || 0; 
           individualData[monthStr].total_feed_intake += record.total_feed_intake || 0;
-          individualData[monthStr].death_count += record.total_deaths || 0; // Add this
+          individualData[monthStr].death_count += record.total_deaths || 0;  
           individualData[monthStr].average_body_weight += record.average_body_weight || 0;
           individualData[monthStr].record_count += 1;
         }
@@ -181,7 +181,7 @@ const MonthlyTrends = () => {
     accumulateRecords(records.individualEggs, "individualEggs");
     accumulateRecords(records.individualVaccinations, "individualVaccinations");
     accumulateRecords(records.individualFeedIntakes.feed_intake, "individualFeedIntakes");
-    accumulateRecords(records.individualDeathCounts, "individualDeathCounts"); // Add this
+    accumulateRecords(records.individualDeathCounts, "individualDeathCounts");  
 
     accumulateRecords(records.individualBodyweights, "individualBodyweights");
   
@@ -195,7 +195,7 @@ const MonthlyTrends = () => {
       month,
       total_egg_production: individualData[month]?.total_egg_production || 0,
       vaccination_count: individualData[month]?.vaccination_count || 0,
-      death_count: individualData[month]?.death_count || 0, // Add this
+      death_count: individualData[month]?.death_count || 0,  
       total_feed_intake: individualData[month]?.total_feed_intake || 0,
       average_body_weight: individualData[month]?.average_body_weight || 0,
       record_count: individualData[month]?.record_count || 0,

@@ -62,15 +62,13 @@ export default function Brand({ children }) {
   return (
     <BrandRoot>
       <Box display="flex" alignItems="center">
-        {/* Display the dashboard image */}
-        <img
+         <img
           src={profile.dashboard_image}
           alt="Dashboard"
           style={{ width: 50, height: 50, borderRadius: 20 }}
         />
 
-        {/* Display the bio */}
-        <StyledSpan mode={mode} className="sidenavHoverShow">
+         <StyledSpan mode={mode} className="sidenavHoverShow">
           {profile.bio}
         </StyledSpan>
       </Box>

@@ -27,15 +27,7 @@ const ExtAndIntCommon = {
   textDecoration: "none",
   justifyContent: "space-between",
   transition: "all 150ms ease-in",
-"&:hover": { 
-  backgroundColor: "#19B839",  
-  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)", 
-  transform: "translateY(-2px)",  
-  transition: "all 0.3s ease-in-out"  
-}
-
-,
-
+  "&:hover": { background: "rgba(255, 255, 255, 0.08)" },
   "&.compactNavItem": {
     overflow: "hidden",
     justifyContent: "center !important"
@@ -47,7 +39,6 @@ const ExtAndIntCommon = {
     verticalAlign: "middle"
   }
 };
-
 
 const ExternalLink = styled("a")(({ theme }) => ({
   ...ExtAndIntCommon,

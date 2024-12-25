@@ -279,10 +279,10 @@ export const getGroupEggs = async () => {
 };
 
 
-// FETCH ALL NEW EGG
-export const getNewGroupEggs = async () => {
+// FETCH ALL  EGGsS FOR DASHBAORD 
+export const getGroupEggsForDashboard = async () => {
     try {
-        const response = await axios.get(`${CHICKEN_API_URL}new_group_egg/list/`, {
+        const response = await axios.get(`${CHICKEN_API_URL}group_egg_dashboard/list/`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             }
@@ -706,6 +706,22 @@ export const updateGroupVaccinationInAPI = async (id, formData) => {
         return response.data;
     } catch (error) {
         console.error('Error updating group_vaccine:', error);
+        throw error;
+    }
+};
+
+
+// getGroupEggsForDashboard
+export const getIndividualEggsForDashboard = async () => {
+    try {
+        const response = await axios.get(`${CHICKEN_API_URL}individual_egg_dashboard/list/`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            }
+        });
+         return response.data;
+    } catch (error) {
+        console.error('Error fetching top individual egg productions:', error);
         throw error;
     }
 };

@@ -118,6 +118,9 @@ const ViewIndividualChicken = () => {
             try {
                 const breedsData = await getBreeds();
                 setBreeds(breedsData);
+                breeds.forEach((breed, index) => {
+                    console.log(`Breed ${index + 1}:`, breed);
+                });
             } catch (error) {
                 console.error('Error fetching Breeds:', error);
             }
@@ -133,6 +136,7 @@ const ViewIndividualChicken = () => {
         fetchBreeds();
         fetchHouses();
     }, [add, edit]);
+    
     const getBreedDetails = (id) => {
         const breed = breeds.find((b) => b.id === id);
         return breed ? `${breed.name}` : 'Unknown Breed';
