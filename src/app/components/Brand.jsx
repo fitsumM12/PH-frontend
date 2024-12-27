@@ -2,9 +2,10 @@ import axios from 'axios';
 import { Box, styled } from "@mui/material";
 import { Span } from "./Typography";
 import useSettings from "app/hooks/useSettings";
-import ProfileContext from "app/views/components/tables/ManageDashboardProfile";
 import "@fontsource/pacifico";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect,useContext } from 'react';
+import { ProfileContext } from "app/contexts/profileContext"; // Ensure this context provides the necessary data
+
 
 const BrandRoot = styled(Box)(() => ({
   display: "flex",
@@ -35,6 +36,9 @@ const StyledSpan = styled(Span)(({ theme, mode }) => ({
 }));
 
 export default function Brand({ children }) {
+  const { profileStatus } = useContext(ProfileContext); // Use context to get the profile data
+console.log(profileStatus);
+
   const [profile, setProfile] = useState({
     bio: '',
     dashboard_image: '',
@@ -54,7 +58,7 @@ export default function Brand({ children }) {
     };
 
     fetchProfileData();
-  }, []);
+  }, [profileStatus]);
 
   console.log('Dashboard Image URL:', profile.dashboard_image);
   console.log("Bio:", profile.bio);

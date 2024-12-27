@@ -6,7 +6,9 @@ import { Theme } from "./components";
 import { AuthProvider } from "./contexts/JWTAuthContext";
 import SettingsProvider from "./contexts/SettingsContext";
 import AppProvider from "./contexts/AppProvider";
+import ProfileContextProvider from "./contexts/profileContextProvider";   
 // ROUTES
+
 import routes from "./routes";
 
 
@@ -17,10 +19,12 @@ export default function App() {
     <SettingsProvider>
       <AuthProvider>
         <AppProvider>
+          <ProfileContextProvider>
           <Theme>
             <CssBaseline />
             {content}
           </Theme>
+          </ProfileContextProvider>
         </AppProvider>
       </AuthProvider>
     </SettingsProvider>

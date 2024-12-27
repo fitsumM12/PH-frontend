@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, styled, Avatar } from "@mui/material";
+import React, { useState, useEffect ,useContext} from "react";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import RecordManageCard from 'app/views/components/RecordManageCard';
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDove } from "@fortawesome/free-solid-svg-icons";
 import { faUserEdit } from '@fortawesome/free-solid-svg-icons';
-
+import { ProfileContext } from "app/contexts/profileContext";  
+import { Box, Button, TextField, Typography, styled, Avatar, Snackbar, Alert } from "@mui/material";
 const token = localStorage.getItem('token');
 
 const Container = styled("div")(({ theme }) => ({
@@ -26,7 +26,12 @@ const FormBox = styled(Box)(({ theme }) => ({
 
 
 export default function ManageDashboardProfile() {
+    const [successSnackbarOpen, setSuccessSnackbarOpen] = useState(false);
+
+    const { setProfileStatus } = useContext(ProfileContext); 
+
     const [isActive, setIsActive] = useState(false);
+
 
     const handleToggle = () => {
         setIsActive(!isActive);
@@ -36,6 +41,7 @@ export default function ManageDashboardProfile() {
     const [landingpageImage, setLandingpageImage] = useState(null);
     const [previewDashboardImage, setPreviewDashboardImage] = useState(null);
     const [previewLandingpageImage, setPreviewLandingpageImage] = useState(null);
+
 
     useEffect(() => {
         const fetchProfileData = async () => {
@@ -90,16 +96,37 @@ export default function ManageDashboardProfile() {
             });
 
             console.log("Success:", response.data);
-            alert("Profile updated successfully!");
-            window.location.reload();
+            // alert("Profile updated successfully!");
+
+            
+            setProfileStatus(prev => prev + 1);  
+            setSuccessSnackbarOpen(true); // Show success snackbar
+            // window.location.reload();
         } catch (error) {
             console.error("Error:", error);
             alert("Failed to update profile. Please try again.");
         }
     };
 
+
+    const handleSnackbarClose = () => {
+        setSuccessSnackbarOpen(false);
+    };
+
+
     return (
         <Container>
+            <Snackbar
+                open={successSnackbarOpen}
+                autoHideDuration={6000}
+                onClose={handleSnackbarClose}
+                anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            >
+                <Alert onClose={handleSnackbarClose} severity="success">
+                    Profile updated successfully!
+                </Alert>
+            </Snackbar>      
+
             <RecordManageCard>
                 <FormBox>
                     <Box

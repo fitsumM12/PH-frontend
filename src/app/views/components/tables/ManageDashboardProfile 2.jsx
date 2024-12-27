@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useContext} from "react";
 import { Box, Button, TextField, Typography, styled, Avatar } from "@mui/material";
 import UploadFileIcon from "@mui/icons-material/UploadFile";
 import RecordManageCard from 'app/views/components/RecordManageCard';
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDove } from "@fortawesome/free-solid-svg-icons";
-import { faUserEdit } from '@fortawesome/free-solid-svg-icons'; 
-
+import { faUserEdit } from '@fortawesome/free-solid-svg-icons';
+import { ProfileContext } from "app/contexts/profileContext";  
 const token = localStorage.getItem('token');
 
 const Container = styled("div")(({ theme }) => ({
@@ -26,6 +26,14 @@ const FormBox = styled(Box)(({ theme }) => ({
 
 
 export default function ManageDashboardProfile() {
+    const { setProfileStatus } = useContext(ProfileContext); 
+
+    const [isActive, setIsActive] = useState(false);
+
+
+    const handleToggle = () => {
+        setIsActive(!isActive);
+    };
     const [bio, setBio] = useState("");
     const [dashboardImage, setDashboardImage] = useState(null);
     const [landingpageImage, setLandingpageImage] = useState(null);
@@ -35,12 +43,12 @@ export default function ManageDashboardProfile() {
     useEffect(() => {
         const fetchProfileData = async () => {
             try {
-                 const profileResponse = await axios.get("http://localhost:8000/api/dashboard-profile/");
+                const profileResponse = await axios.get("http://localhost:8000/api/dashboard-profile/");
                 setBio(profileResponse.data.bio);
                 setDashboardImage(profileResponse.data.dashboard_image);
                 setPreviewDashboardImage(profileResponse.data.dashboard_image);
 
-                 const landingPageResponse = await axios.get("http://localhost:8000/api/landingpage-image/");
+                const landingPageResponse = await axios.get("http://localhost:8000/api/landingpage-image/");
                 setLandingpageImage(landingPageResponse.data.landingpage_image);
                 setPreviewLandingpageImage(landingPageResponse.data.landingpage_image);
             } catch (error) {
@@ -62,74 +70,75 @@ export default function ManageDashboardProfile() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         const formData = new FormData();
-    
-         if (bio) {
+
+        if (bio) {
             formData.append("bio", bio);
         }
-    
-         if (dashboardImage && dashboardImage !== previewDashboardImage) {
+
+        if (dashboardImage && dashboardImage !== previewDashboardImage) {
             formData.append("dashboard_image", dashboardImage);
         }
-    
+
         if (landingpageImage && landingpageImage !== previewLandingpageImage) {
             formData.append("landingpage_image", landingpageImage);
         }
-    
+
         try {
             const response = await axios.patch("http://localhost:8000/api/dashboard-profile/", formData, {
                 headers: {
                     "Content-Type": "multipart/form-data",
-                 },
+                },
             });
-    
+
             console.log("Success:", response.data);
-            alert("Profile updated successfully!");
-            window.location.reload();
+            // alert("Profile updated successfully!");
+            setProfileStatus(prev => prev + 1);  
+            // window.location.reload();
         } catch (error) {
             console.error("Error:", error);
             alert("Failed to update profile. Please try again.");
         }
     };
-    
+
     return (
         <Container>
             <RecordManageCard>
                 <FormBox>
-                <Box
-  sx={{
-    display: 'flex',         
-    alignItems: 'center',    
-    gap: 2,                  
-    mb: { xs: 2, sm: 0 },    
-  }}
->
-  <Box
-    sx={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    //   backgroundColor: '#FFF7E0',  
-      borderRadius: '50%',        
-      padding: 2,                  
-    }}
-  >
-    <FontAwesomeIcon
-      icon={faUserEdit}
-      color="#ECAE1F"
-      style={{ fontSize: '32px' }}
-    />
-  </Box>
-  
-  <Typography variant="h5" fontWeight="bold" gutterBottom>
-    Update Dashboard Profile
-  </Typography>
-</Box>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 2,
+                            mb: { xs: 2, sm: 0 },
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                //   backgroundColor: '#FFF7E0',  
+                                borderRadius: '50%',
+                                padding: 2,
+                            }}
+                        >
+                            <FontAwesomeIcon
+                                icon={faUserEdit}
+                                color="#ECAE1F"
+                                style={{ fontSize: '32px' }}
+                            />
+                        </Box>
+
+                        <Typography variant="h5" fontWeight="bold" gutterBottom>
+                            Update Dashboard Profile
+                        </Typography>
+                    </Box>
 
 
-                     <Box display="flex" justifyContent="space-between" mt={3}>
-                         <Box display="flex" flexDirection="column" alignItems="center" flex={1} mr={2}>
+                    <Box display="flex" justifyContent="space-between" mt={3}>
+                        <Box display="flex" flexDirection="column" alignItems="center" flex={1} mr={2}>
                             <Avatar
                                 src={previewDashboardImage || "/static/images/avatar-placeholder.png"}
                                 alt="Dashboard Preview"
@@ -141,9 +150,19 @@ export default function ManageDashboardProfile() {
                                 }}
                             />
                             <Button
-                                variant="contained"
+                                variant={isActive ? 'contained' : 'outlined'}
                                 component="label"
                                 startIcon={<UploadFileIcon />}
+                                sx={{
+                                    backgroundColor: isActive ? '#19B839' : 'transparent',
+                                    color: isActive ? '#fff' : '#19B839',
+                                    borderColor: '#19B839',
+                                    '&:hover': {
+                                        backgroundColor: isActive ? '#17a832' : '#19B839',
+                                        color: '#fff',
+                                    },
+                                }}
+                                onClick={handleToggle}
                             >
                                 Upload Dashboard Image
                                 <input
@@ -155,6 +174,10 @@ export default function ManageDashboardProfile() {
                                     }
                                 />
                             </Button>
+
+
+
+
                             <Typography variant="body2" color="textSecondary">
                                 {dashboardImage ? dashboardImage.name : "No file selected"}
                             </Typography>
@@ -172,9 +195,19 @@ export default function ManageDashboardProfile() {
                                 }}
                             />
                             <Button
-                                variant="contained"
+                                variant={isActive ? 'contained' : 'outlined'}
                                 component="label"
                                 startIcon={<UploadFileIcon />}
+                                sx={{
+                                    backgroundColor: isActive ? '#19B839' : 'transparent',
+                                    color: isActive ? '#fff' : '#19B839',
+                                    borderColor: '#19B839',
+                                    '&:hover': {
+                                        backgroundColor: isActive ? '#17a832' : '#19B839',
+                                        color: '#fff',
+                                    },
+                                }}
+                                onClick={handleToggle}
                             >
                                 Upload Landing Page Image
                                 <input
@@ -192,7 +225,7 @@ export default function ManageDashboardProfile() {
                         </Box>
                     </Box>
 
-                     <Box
+                    <Box
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -208,11 +241,25 @@ export default function ManageDashboardProfile() {
                             onChange={(e) => setBio(e.target.value)}
                             sx={{
                                 width: '50%',
+                                '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                        borderColor: '#19B839',
+                                    },
+                                    '&:hover fieldset': {
+                                        borderColor: '#19B839',
+                                    },
+                                    '&.Mui-focused fieldset': {
+                                        borderColor: '#19B839',
+                                    },
+                                },
+                                '& .MuiInputLabel-root.Mui-focused': {
+                                    color: '#19B839',
+                                },
                             }}
                         />
                     </Box>
 
-                     <Box
+                    <Box
                         sx={{
                             display: 'flex',
                             justifyContent: 'center',
@@ -221,16 +268,23 @@ export default function ManageDashboardProfile() {
                     >
                         <Button
                             variant="contained"
-                            color="primary"
                             onClick={handleSubmit}
                             size="large"
                             sx={{
                                 width: '15%',
                                 margin: '0 20%',
+                                backgroundColor: '#19B839',
+                                color: '#fff',
+                                borderColor: '#19B839',
+                                '&:hover': {
+                                    backgroundColor: '#17a832',
+                                    color: '#fff',
+                                },
                             }}
                         >
                             Save Profile
                         </Button>
+
                     </Box>
                 </FormBox>
             </RecordManageCard>

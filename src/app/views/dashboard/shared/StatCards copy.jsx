@@ -14,6 +14,8 @@ import { getGroupEggs } from "app/apis/group_chicken_api";
 import { getGroupEggsForDashboard } from "app/apis/group_chicken_api";
 import { getIndividualEggsForDashboard } from "app/apis/group_chicken_api";
 import { useEffect, useState } from "react";
+import { ButtonBase } from "@mui/material";
+
 import StarIcon from '@mui/icons-material/Star';
 const HoverableTableRow = styled(TableRow)(({ theme }) => ({
   "&:hover": {
@@ -62,7 +64,7 @@ export const StatCards = () => {
   const [hatcheryUnits, setHatcheryUnits] = useState(0);
   const [hatcherySummaries, setHatcherySummaries] = useState(0);
   const [topThreeGroups, setTopThreeGroups] = useState([]);
-  const [topThreeIndividuals, setTopThreeIndividuals] = useState([]);
+  const [topIndividuals, setTopIndividuals] = useState([]);
   const [pageSizeIndividual, setPageSizeIndividual] = useState(3);
   const [pageSizeGroup, setPageSizeGroup] = useState(5);
   const [activeGrid, setActiveGrid] = useState(1);
@@ -131,22 +133,22 @@ export const StatCards = () => {
   const EggProductionTableForIndividual = () => {
 
     useEffect(() => {
-      const fetchTopThreeIndividualEggProduction = async () => {
+      const fetchTopIndividualEggProduction = async () => {
         try {
           const eggDataForIndividual = await getIndividualEggsForDashboard();
 
           if (Array.isArray(eggDataForIndividual)) {
             const sortedEggDataForIndividual = eggDataForIndividual.sort((a, b) => b.total_egg_production - a.total_egg_production);
 
-            const topThreeIndividuals = sortedEggDataForIndividual.slice(0, 3);
-            setTopThreeIndividuals(topThreeIndividuals);
+            const topIndividuals = sortedEggDataForIndividual.slice(0, 3);
+            setTopIndividuals(topIndividuals);
           }
         } catch (error) {
           console.error('Error fetching egg production data:', error);
         }
       };
 
-      fetchTopThreeIndividualEggProduction();
+      fetchTopIndividualEggProduction();
     }, []);
   }
   EggProductionTableForIndividual()
@@ -162,66 +164,54 @@ export const StatCards = () => {
   ];
 
 
-
   return (
     <>
 
 
       <Grid item xs={12} sx={{ mb: "10px" }}>
         <StyledCard elevation={2}>
-          <div
+        <ButtonBase
+  onMouseEnter={() => setIsHoveredGroup(true)}
+  onMouseLeave={() => setIsHoveredGroup(false)}
+  onClick={() => setActiveGrid(1)}
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    overflow: "hidden",
+    borderRadius: "4px",
+    height: 44,
+    whiteSpace: "pre",
+    marginBottom: "8px",
+    textDecoration: "none",
+    transition: "all 150ms ease-in",
+     backgroundColor: isHoveredGroup ? "#19B839" : "rgba(25, 184, 57, 0.1)",
+     boxShadow: isHoveredGroup
+      ? "0 6px 20px rgba(0, 0, 0, 0.3)"  
+      : "0 4px 15px rgba(0, 0, 0, 0.1)",  
+    transform: isHoveredGroup ? "translateY(-2px)" : "none",
+    padding: "8px 16px",
+  }}
+>
+  <Box sx={{ display: "flex", alignItems: "center" }}>
+    <StarIcon
+      sx={{ marginRight: 2, color: "gold", cursor: "pointer" }}
+    />
+    <Typography
+      gutterBottom
+      sx={{
+        fontSize: "0.875rem",
+        fontWeight: "bold",
+        cursor: "pointer",
+        color: isHoveredGroup ? "#fff" : "#000",
+      }}
+    >
+      Top Egg-Producing Groups
+    </Typography>
+  </Box>
+</ButtonBase>
 
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              overflow: "hidden",
-              borderRadius: "4px",
-              height: 44,
-              whiteSpace: "pre",
-              marginBottom: "8px",
-              textDecoration: "none",
-              transition: "all 150ms ease-in",
-              backgroundColor: isHoveredGroup ? "#19B839" : "transparent",
-              boxShadow: isHoveredGroup ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
-              transform: isHoveredGroup ? "translateY(-2px)" : "none",
-            }}
-            onMouseEnter={() => setIsHoveredGroup(true)}
-            onMouseLeave={() => setIsHoveredGroup(false)}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <StarIcon
-                style={{ marginRight: 8, color: "gold", cursor: "pointer" }}
-                onClick={() => setActiveGrid(1)}
-              />
-              <Typography
-                gutterBottom
-                sx={{ fontSize: "0.875rem", fontWeight: "bold", cursor: "pointer" }}
-                onClick={() => setActiveGrid(1)}
-              >
-                Top Egg-Producing Groups
-              </Typography>
-            </div>
-            <div>
-
-              <select
-                onChange={(e) => setPageSizeGroup(Number(e.target.value))}
-                value={pageSizeGroup}
-                style={{
-                  marginBottom: '10px',
-                  padding: '4px',
-                  border: '1px solid rgb(28, 185, 72)',
-                  borderRadius: '4px',
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-              </select>
-            </div>
-
-          </div>
           {activeGrid === 1 && (
             <TableContainer
               style={{
@@ -259,96 +249,79 @@ export const StatCards = () => {
       </Grid>
 
       <Grid item xs={12} sx={{ mb: "10px" }}>
-        <StyledCard elevation={2}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              overflow: "hidden",
-              borderRadius: "4px",
-              height: 44,
-              whiteSpace: "pre",
-              marginBottom: "8px",
-              textDecoration: "none",
-              transition: "all 150ms ease-in",
-              backgroundColor: isHoveredIndividual ? "#19B839" : "transparent",
-              boxShadow: isHoveredIndividual ? "0 4px 8px rgba(0, 0, 0, 0.2)" : "none",
-              transform: isHoveredIndividual ? "translateY(-2px)" : "none",
-            }}
-            onMouseEnter={() => setIsHoveredIndividual(true)}
-            onMouseLeave={() => setIsHoveredIndividual(false)}
-          >
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <StarIcon
-                style={{ marginRight: 8, color: "gold", cursor: "pointer" }}
-                onClick={() => setActiveGrid(2)}
-              />
-              <Typography
-                gutterBottom
-                sx={{ fontSize: "0.875rem", fontWeight: "bold", cursor: "pointer" }}
-                onClick={() => setActiveGrid(2)}
-              >
-                Top Egg-Producing Individuals
-              </Typography>
-            </div>
-            <div>
-              <select
-                onChange={(e) => setPageSizeIndividual(Number(e.target.value))}
-                value={pageSizeIndividual}
-                style={{
-                  marginBottom: '10px',
-                  padding: '4px',
-                  border: '1px solid rgb(28, 185, 72)',
-                  borderRadius: '4px',
-                  height: '100%',
-                }}
-              >
-                <option value={5}>5</option>
-                <option value={10}>10</option>
-                <option value={20}>20</option>
-              </select>
-            </div>
-          </div>
-          {activeGrid === 2 && (
-            <TableContainer
-              style={{
-                maxHeight: 300,
-                overflowY: "auto",
-              }}
-            >
-              <Table stickyHeader>
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">Bird ID</TableCell>
-                    <TableCell align="center">Breed Name</TableCell>
-                    <TableCell align="center">Number of Eggs</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                {topThreeIndividuals.length > 0 ? (
-                    topThreeIndividuals.slice(0, pageSizeIndividual).map((individual) => (
-                        <HoverableTableRow key={individual.id}>
-                            <TableCell align="center">{individual.bird.bird_id}</TableCell>
-                            <TableCell align="center">{individual.bird.breed.name}</TableCell> {/* Accessing breed name */}
-                            <TableCell align="center">{individual.egg_count}</TableCell>
-                        </HoverableTableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell align="center" colSpan={2}>
-                        No data available
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </StyledCard>
-      </Grid>
+    <StyledCard elevation={2}>
+    <ButtonBase
+  onMouseEnter={() => setIsHoveredIndividual(true)}
+  onMouseLeave={() => setIsHoveredIndividual(false)}
+  onClick={() => setActiveGrid(2)}
+  sx={{
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    overflow: "hidden",
+    borderRadius: "4px",
+    height: 44,
+    whiteSpace: "pre",
+    marginBottom: "8px",
+    textDecoration: "none",
+    transition: "all 150ms ease-in",
+    backgroundColor: isHoveredIndividual ? "#19B839" : "rgba(25, 184, 57, 0.1)",
+    boxShadow: isHoveredIndividual ? "0 6px 20px rgba(0, 0, 0, 0.3)" : "0 4px 10px rgba(0, 0, 0, 0.1)",
+    transform: isHoveredIndividual ? "translateY(-2px)" : "none",
+    padding: "8px 16px",
+  }}
+>
+  <Box sx={{ display: "flex", alignItems: "center" }}>
+    <StarIcon
+      sx={{ marginRight: 2, color: "gold", cursor: "pointer" }}
+    />
+    <Typography
+      gutterBottom
+      sx={{ fontSize: "0.875rem", fontWeight: "bold", cursor: "pointer", color: isHoveredIndividual ? "#fff" : "#000" }}
+    >
+      Top Egg-Producing Individuals
+    </Typography>
+  </Box>
+</ButtonBase>
 
+      {activeGrid === 2 && (
+        <TableContainer
+          style={{
+            maxHeight: 300,
+            overflowY: "auto",
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow>
+                <TableCell align="center">Bird ID</TableCell>
+                <TableCell align="center">Breed Name</TableCell>
+                <TableCell align="center">Number of Eggs</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {topIndividuals.length > 0 ? (
+                topIndividuals.slice(0, pageSizeIndividual).map((individual) => (
+                  <HoverableTableRow key={individual.id}>
+                    <TableCell align="center">{individual.bird.bird_id}</TableCell>
+                    <TableCell align="center">{individual.bird.breed.name}</TableCell>
+                    <TableCell align="center">{individual.egg_count}</TableCell>
+                  </HoverableTableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell align="center" colSpan={3}>
+                    No data available
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </StyledCard>
+  </Grid>
 
       <Grid container spacing={1} >
         {cardList.map(({ amount, Icon, name, color }) => (

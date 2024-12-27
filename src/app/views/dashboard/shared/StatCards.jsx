@@ -187,12 +187,10 @@ export const StatCards = () => {
     marginBottom: "8px",
     textDecoration: "none",
     transition: "all 150ms ease-in",
-    // Transparent green when not hovered, solid green on hover
-    backgroundColor: isHoveredGroup ? "#19B839" : "rgba(25, 184, 57, 0.1)",
-    // Increased shadow on hover, more prominent
-    boxShadow: isHoveredGroup
-      ? "0 6px 20px rgba(0, 0, 0, 0.3)" // Darker and bigger shadow when hovered
-      : "0 4px 15px rgba(0, 0, 0, 0.1)", // Subtle shadow when not hovered
+     backgroundColor: isHoveredGroup ? "#19B839" : "rgba(25, 184, 57, 0.1)",
+     boxShadow: isHoveredGroup
+      ? "0 6px 20px rgba(0, 0, 0, 0.3)"  
+      : "0 4px 15px rgba(0, 0, 0, 0.1)",  
     transform: isHoveredGroup ? "translateY(-2px)" : "none",
     padding: "8px 16px",
   }}
