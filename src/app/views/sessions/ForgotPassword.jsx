@@ -31,7 +31,7 @@ export default function NotFound() {
   return (
     <NotFoundRoot>
       <JustifyBox>
-        <IMG src="/assets/images/illustrate/404-error.png" alt="" />
+        <IMG src={process.env.PUBLIC_URL + "/assets/images/illustrate/404-error.png"} alt="" />
         <Button
           color="primary"
           variant="contained"

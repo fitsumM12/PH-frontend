@@ -55,14 +55,14 @@ const validationSchema = Yup.object().shape({
 export default function JwtLogin() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [landingPageImage, setLandingPageImage] = useState("/assets/images/screening.gif");
+  const [landingPageImage, setLandingPageImage] = useState(process.env.PUBLIC_URL + "/assets/images/screening.gif");
 
   const { login } = useAuth();
 
   useEffect(() => {
     const fetchLandingPageImage = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/landingpage-image/");
+        const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/landingpage-image/`);
         setLandingPageImage(response.data.landingpage_image); // Corrected key
       } catch (error) {
         console.error("Error fetching landing page image:", error);

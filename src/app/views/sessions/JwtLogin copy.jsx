@@ -87,7 +87,7 @@ export default function JwtLogin() {
         <Grid container>
           <Grid item sm={6} xs={12}>
             <div className="img-wrapper">
-              <img src="/assets/images/screening.gif" style={{ borderRadius: 20 }} width="100%" alt="" />
+              <img src={process.env.PUBLIC_URL + "/assets/images/screening.gif"} style={{ borderRadius: 20 }} width="100%" alt="" />
             </div>
           </Grid>
 

@@ -23,7 +23,7 @@ export default function Loading() {
   return (
     <StyledLoading>
       <Box position="relative">
-        <img src="/assets/images/EAII.png" alt="" />
+        <img src={process.env.PUBLIC_URL + "/assets/images/EAII.png"} alt="" />
         <CircularProgress className="circleProgress" />
       </Box>
     </StyledLoading>
