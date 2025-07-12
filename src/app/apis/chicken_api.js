@@ -1,11 +1,9 @@
 import axios from 'axios';
 
+const BASEURL =  process.env.REACT_APP_API_BASE_URL
 // Base URL for your API
-const CHICKEN_API_URL = 'http://127.0.0.1:8000/api/poultry/';
+const CHICKEN_API_URL = `${BASEURL}/api/poultry/`;
 const token = localStorage.getItem('token');
-
-
-// BREED APIS
 
 // ADD BREED
 export const addBreed = async (formData) => {

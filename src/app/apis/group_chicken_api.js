@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 // Base URL for your API
-const CHICKEN_API_URL = 'http://127.0.0.1:8000/api/poultry/';
+
+const BASEURL =  process.env.REACT_APP_API_BASE_URL
+const CHICKEN_API_URL = `${BASEURL}/api/poultry/`;
 const token = localStorage.getItem('token');
 
 

@@ -102,7 +102,7 @@ console.log( "This is LandingPage Image"+" "+ landingPageImage);
           <Grid item sm={6} xs={12}>
             <div className="img-wrapper">
               <img
-                src={landingPageImage}
+                src={process.env.PUBLIC_URL+'/assets/image/log'}
                 style={{ borderRadius: 20 }}
                 width="100%"
                 alt="Landing Page"
