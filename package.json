@@ -1,6 +1,7 @@
 {
   "name": "Poultry",
   "version": "4.0.0",
+  "homepage":"poultry-hub",
   "private": true,
   "scripts": {
     "start": "react-scripts start",
