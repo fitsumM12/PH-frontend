@@ -3,7 +3,7 @@ import axios from 'axios';
 // Base URL for your API
 
 const BASEURL =  process.env.REACT_APP_API_BASE_URL
-const CHICKEN_API_URL = `${BASEURL}/api/poultry/`;
+const HATCHERY_UNIT_API_URL = `${BASEURL}/api/poultry/`;
 const token = localStorage.getItem('token');
 
 
